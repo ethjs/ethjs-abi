@@ -1,11 +1,13 @@
-## ethers-abi
+## ethjs-abi
 
 Just method and event encoding and decoding from the [`ethers-wallet`](https://github.com/ethers-io/ethers-wallet).
+
+Note, this package is experimental, incomplete and is under construction.
 
 ## Usage
 
 ```
-const abi = require('ethers-abi');
+const abi = require('ethjs-abi');
 const SimpleStoreABI = [{"constant":false,"inputs":[{"name":"_value","type":"uint256"}],"name":"set","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"get","outputs":[{"name":"storeValue","type":"uint256"}],"payable":false,"type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_newValue","type":"uint256"},{"indexed":false,"name":"_sender","type":"address"}],"name":"SetComplete","type":"event"}];
 
 
@@ -67,10 +69,14 @@ contract SimpleStore {
 }
 ```
 
-License
+## License
 
 This project is licensed under the MIT license, Copyright (c) 2016 Nick Dodson. For more information see LICENSE.md
 
-Original Author:
+## Author
+
+Nick Dodson
+
+## Original Author:
 
 Richard Moore <me@ricmoo.com>

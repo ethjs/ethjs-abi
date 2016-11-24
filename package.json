@@ -1,5 +1,5 @@
 {
-  "name": "ethers-abi",
+  "name": "ethjs-abi",
   "version": "0.0.1",
   "description": "Just the Ethereum encoding and decoding methods from the ethers-io-wallet.",
   "main": "./src/index.js",
@@ -23,7 +23,7 @@
     "encoding",
     "decoding"
   ],
-  "author": "Richard Moore <me@ricmoo.com>",
+  "author": "Nick Dodson <thenickdodson@gmail.com>",
   "repository": {
     "type": "git",
     "url": "git://github.com/silentcicero/ethers-abi"
