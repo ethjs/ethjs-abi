@@ -19,10 +19,5 @@ test('test basic encoding and decoding functionality', function (t) {
   const setCompleteEventInputBytecode = abi.encodeEvent(interface[2], [24000, "0xca35b7d915458ef540ade6068dfe2f44e8fa733c"]);
   const setCompleteEventOutputBytecode = abi.decodeEvent(interface[2], "0x0000000000000000000000000000000000000000000000000000000000000d7d000000000000000000000000ca35b7d915458ef540ade6068dfe2f44e8fa733c");
 
-  console.log(setMethodInputBytecode,
-    setMethodOutputBytecode,
-    getMethodInputBytecode,
-    getMethodOutputBytecode,
-    setCompleteEventInputBytecode,
-    setCompleteEventOutputBytecode);
+  t.equal(setMethodInputBytecode, '0x60fe47b10000000000000000000000000000000000000000000000000000000000005dc0');
 });
