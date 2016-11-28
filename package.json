@@ -52,7 +52,7 @@
   "author": "Nick Dodson <thenickdodson@gmail.com>",
   "repository": {
     "type": "git",
-    "url": "git://github.com/silentcicero/ethers-abi"
+    "url": "git://github.com/ethjs/ethers-abi"
   },
   "license": "MIT",
   "babel": {

@@ -100,13 +100,13 @@ There is always a lot of work to do, and will have many rules to maintain. So pl
 
 Please consult our [Code of Conduct](CODE_OF_CONDUCT.md) docs before helping out.
 
-We communicate via [issues](https://github.com/SilentCicero/ethjs-abi/issues) and [pull requests](https://github.com/SilentCicero/ethjs-abi/pulls).
+We communicate via [issues](https://github.com/ethjs/ethjs-abi/issues) and [pull requests](https://github.com/ethjs/ethjs-abi/pulls).
 
 ## Important documents
 
 - [Changelog](CHANGELOG.md)
 - [Code of Conduct](CODE_OF_CONDUCT.md)
-- [License](https://raw.githubusercontent.com/SilentCicero/ethjs-abi/master/LICENSE)
+- [License](https://raw.githubusercontent.com/ethjs/ethjs-abi/master/LICENSE)
 
 ## Licence
 
