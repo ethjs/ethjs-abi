@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const utils = require('./utils/index.js');
 const uint256Coder = utils.uint256Coder;
 const coderBoolean = utils.coderBoolean;

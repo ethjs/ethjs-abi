@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 var crypto = require('crypto');
 var utils = require('../utils/index.js');
 

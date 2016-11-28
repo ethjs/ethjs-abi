@@ -2,6 +2,7 @@
 
 1. Travic-CI fix
 2. Better testing coverage
+3. Linting stated
 
 # 0.0.2 -- ethjs-abi
 

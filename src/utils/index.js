@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 const rlp = require('rlp');
 const BN = require('bn.js');
 const sha3 = require('ethjs-sha3');

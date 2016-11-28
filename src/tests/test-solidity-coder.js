@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 var solc = require('solc');
 var ethereumVm = require('ethereumjs-vm');
 var ethereumUtil = require('ethereumjs-util');
