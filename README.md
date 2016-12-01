@@ -2,7 +2,44 @@
 
 Just method and event encoding and decoding from the [`ethers-wallet`](https://github.com/ethers-io/ethers-wallet).
 
-Note, this package is experimental, incomplete and is under construction.
+Note, this package is experimental, and is not ready for production use.
+
+<div>
+  <!-- Dependency Status -->
+  <a href="https://david-dm.org/ethjs/ethjs-abi">
+    <img src="https://david-dm.org/ethjs/ethjs-abi.svg"
+    alt="Dependency Status" />
+  </a>
+
+  <!-- devDependency Status -->
+  <a href="https://david-dm.org/ethjs/ethjs-abi#info=devDependencies">
+    <img src="https://david-dm.org/ethjs/ethjs-abi/dev-status.svg" alt="devDependency Status" />
+  </a>
+
+  <!-- Build Status -->
+  <a href="https://travis-ci.org/ethjs/ethjs-abi">
+    <img src="https://travis-ci.org/ethjs/ethjs-abi.svg"
+    alt="Build Status" />
+  </a>
+
+  <!-- NPM Version -->
+  <a href="https://www.npmjs.org/package/ethjs-abi">
+    <img src="http://img.shields.io/npm/v/ethjs-abi.svg"
+    alt="NPM version" />
+  </a>
+
+  <!-- Test Coverage -->
+  <a href="https://coveralls.io/r/ethjs/ethjs-abi">
+    <img src="https://coveralls.io/repos/github/ethjs/ethjs-abi/badge.svg" alt="Test Coverage" />
+  </a>
+
+  <!-- Javascript Style -->
+  <a href="http://airbnb.io/javascript/">
+    <img src="https://img.shields.io/badge/code%20style-airbnb-brightgreen.svg" alt="js-airbnb-style" />
+  </a>
+</div>
+
+<br />
 
 ## Usage
 
