@@ -1,12 +1,11 @@
 {
   "name": "ethjs-abi",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Just the Ethereum encoding and decoding methods from the ethers-io-wallet.",
   "main": "./src/index.js",
   "scripts": {
     "start": "npm test",
-    "test": "node ./node_modules/tape/bin/tape ./src/tests/test.index.js",
-    "test:solidity-coder": "node ./node_modules/.bin/nodeunit ./src/tests/test-solidity-coder.js",
+    "test": "mocha ./src/tests/**/*.js -R spec --timeout 2000000",
     "release": "npmpub",
     "pretest": "npm run lint",
     "lint": "npm run lint:js",
@@ -21,32 +20,36 @@
     "node": ">=6.5.0"
   },
   "dependencies": {
-    "rlp": "2.0.0",
-    "bn.js": "^4.4.0",
+    "bn.js": "4.11.6",
+    "ethjs-sha3": "0.0.1",
+    "ethjs-util": "0.0.4",
     "hash.js": "1.0.3",
-    "ethjs-sha3": "0.0.1"
+    "rlp": "2.0.0"
   },
   "devDependencies": {
-    "ethereumjs-util": "4.3.0",
-    "ethereumjs-vm": "1.4.0",
-    "nodeunit": "0.9.1",
-    "solc": "0.3.5",
-    "tape": "^4.6.3",
-
-    "istanbul": "0.4.5",
     "babel-eslint": "7.1.0",
-    "chai": "^3.5.0",
+    "bignumber.js": "^3.0.1",
+    "bn.js": "^4.4.0",
+    "chai": "3.5.0",
     "coveralls": "2.11.9",
+    "crypto": "0.0.3",
     "eslint": "2.10.1",
     "eslint-config-airbnb": "9.0.1",
     "eslint-import-resolver-webpack": "0.2.4",
     "eslint-plugin-import": "1.8.0",
     "eslint-plugin-jsx-a11y": "1.2.0",
     "eslint-plugin-react": "5.1.1",
+    "ethereumjs-util": "^4.3.0",
+    "ethereumjs-vm": "1.4.0",
+    "ethers-wallet": "^1.0.8",
     "eventsource-polyfill": "0.9.6",
+    "istanbul": "0.4.5",
     "lint-staged": "1.0.1",
-    "mocha": "^3.1.2",
-    "pre-commit": "1.1.3"
+    "mocha": "3.1.2",
+    "nodeunit": "0.9.1",
+    "pre-commit": "1.1.3",
+    "solc": "0.3.5",
+    "tape": "4.6.3"
   },
   "keywords": [
     "ethereum",

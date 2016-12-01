@@ -3,13 +3,7 @@
 const rlp = require('rlp');
 const BN = require('bn.js');
 const sha3 = require('ethjs-sha3');
-
-function defineProperty(object, name, value) {
-  Object.defineProperty(object, name, {
-    enumerable: true,
-    value: value,
-  });
-}
+const utils = require('ethjs-util');
 
 function getChecksumAddress(address) {
   if (typeof(address) !== 'string' || !address.match(/^0x[0-9A-Fa-f]{40}$/)) {
@@ -37,10 +31,11 @@ function getAddress(address) {
 
   if (typeof(address) !== 'string') { throw new Error('invalid address'); }
 
-  if (address.match(/^(0x)?[0-9a-fA-F]{40}$/)) {
+  // Missing the 0x prefix
+  if (address.substring(0, 2) !== '0x' &&
+      address.substring(0, 2) !== 'XE') { address = '0x' + address; }
 
-    // Missing the 0x prefix
-    if (address.substring(0, 2) !== '0x') { address = '0x' + address; }
+  if (address.match(/^(0x)?[0-9a-fA-F]{40}$/)) {
 
     result = getChecksumAddress(address);
 
@@ -52,6 +47,9 @@ function getAddress(address) {
   // Maybe ICAP? (we only support direct mode)
   } else if (address.match(/^XE[0-9]{2}[0-9A-Za-z]{30,31}$/)) {
 
+    throw new Error('ICAP and IBAN addresses, not supported yet..')
+
+    /*
     // It is an ICAP address with a bad checksum
     if (address.substring(2, 4) !== ibanChecksum(address)) {
       throw new Error('invalid address icap checksum');
@@ -60,7 +58,7 @@ function getAddress(address) {
     result = (new BN(address.substring(4), 36)).toString(16);
     while (result.length < 40) { result = '0' + result; }
     result = getChecksumAddress('0x' + result);
-
+    */
   } else {
     throw new Error('invalid address');
   }
@@ -68,6 +66,7 @@ function getAddress(address) {
   return result;
 }
 
+/*
 // See: https://en.wikipedia.org/wiki/International_Bank_Account_Number
 var ibanChecksum = (function() {
 
@@ -101,8 +100,10 @@ var ibanChecksum = (function() {
     return checksum;
   };
 })();
+*/
 
 
+/*
 function getIcapAddress(address) {
   address = getAddress(address).substring(2);
   var base36 = (new BN(address, 16)).toString(36).toUpperCase();
@@ -118,6 +119,9 @@ function getContractAddress(transaction) {
   ]), true).slice(12).toString('hex'));
 }
 
+*/
+
+/*
 function cloneObject(object) {
   var clone = {};
   for (var key in object) { clone[key] = object[key]; }
@@ -127,9 +131,20 @@ function cloneObject(object) {
 function stripZeros(buffer) {
   var i = 0;
   for (i = 0; i < buffer.length; i++) {
-    if (buffer[i] !== 0) { break; }
+    if (Number(buffer[i]) !== 0) { break; }
   }
   return (i > 0) ? buffer.slice(i): buffer;
+}
+*/
+
+// from ethereumjs-util
+function stripZeros(a) {
+  var first = a[0];
+  while (a.length > 0 && first.toString() === '0') {
+    a = a.slice(1);
+    first = a[0];
+  }
+  return a;
 }
 
 function bnToBuffer(bn) {
@@ -149,8 +164,8 @@ function isHexString(value, length) {
 function hexOrBuffer(value, name) {
   if (!Buffer.isBuffer(value)) {
     if (!isHexString(value)) {
-      var error = new Error(name ? ('invalid ' + name) : 'invalid hex or buffer');
-      error.reason = 'invalid hex string';
+      var error = new Error(name ? ('invalid ' + name) : 'invalid hex or buffer, must be a prefixed alphanumeric even length hex string');
+      error.reason = 'invalid hex string, hex must be prefixed and alphanumeric (e.g. 0x023..)';
       error.value = value;
       throw error;
     }
@@ -171,10 +186,9 @@ function hexlify(value, name) {
   } else {
     return '0x' + hexOrBuffer(value).toString('hex');
   }
-  throw new Error('invalid value');
 }
 
-
+/*
 // Creates property that is immutable
 function defineFrozen(object, name, value) {
   var frozen = JSON.stringify(value);
@@ -183,6 +197,13 @@ function defineFrozen(object, name, value) {
     get: function() { return JSON.parse(frozen); }
   });
 }
+
+// Parse N from type<N>
+
+function parseTypeN (type) {
+  return parseInt(/^\D+(\d+)$/.exec(type)[1], 10);
+}
+*/
 
 // getKeys([{a: 1, b: 2}, {a: 3, b: 4}], 'a') => [1, 3]
 function getKeys(params, key, allowEmpty) {
@@ -204,16 +225,38 @@ function getKeys(params, key, allowEmpty) {
 }
 
 // Convert the value from a Number to a BN (if necessary)
-function numberOrBN(value) {
+/* function numberOrBN(value) {
+  var bnValue = value;
   if (!value.eq) {
-    if (typeof(value) !== 'number') {
+    if (typeof value !== 'number') {
       throw new Error('invalid number');
     }
-    value = new BN(value);
+    bnValue = new BN(value);
   }
-  return value;
+  return bnValue;
+}
+*/
+
+// from ethereumjs-util
+function numberOrBN(arg) {
+  var type = typeof arg;
+  if (type === 'string') {
+    if (utils.isHexPrefixed(arg)) {
+      return new BN(utils.stripHexPrefix(arg), 16);
+    } else {
+      return new BN(arg, 10);
+    }
+  } else if (type === 'number') {
+    return new BN(arg);
+  } else if (type !== 'undefined' && arg.toArray) {
+    // assume this is a BN for the moment, replace with BN.isBN soon
+    return arg;
+  } else {
+    throw new Error(`Argument ${JSON.stringify(arg)} is not a valid number (hex or otherwise) while converting with numberOrBN method`);
+  }
 }
 
+/*
 function zpad(buffer, length) {
   var zero = new Buffer([0]);
   while (buffer.length < length) {
@@ -221,11 +264,12 @@ function zpad(buffer, length) {
   }
   return buffer;
 }
+*/
 
 function coderNumber(size, signed) {
     return {
         encode: function(value) {
-          value = numberOrBN(value)
+          value = numberOrBN(value);
           value = value.toTwos(size * 8).maskn(size * 8);
           if (signed) {
             value = value.fromTwos(size * 8).toTwos(256);
@@ -422,8 +466,9 @@ function getParamCoder(type) {
         if (coder) { throw new Error('invalid type ' + type); }
         var size = parseInt(part[3] || 256);
         if (size === 0 || size > 256 || (size % 8) !== 0) {
-            throw new Error('invalid type ' + type);
+            throw new Error(`invalid ${prefix}<N> width: ${type}`);
         }
+
         coder = coderNumber(size / 8, (prefix === 'int'));
         break;
 
@@ -474,11 +519,11 @@ function getParamCoder(type) {
 
 module.exports = {
   BN,
-  defineProperty,
   getAddress,
-  getIcapAddress,
-  getContractAddress,
-  cloneObject,
+  // getIcapAddress,
+  getChecksumAddress,
+  // getContractAddress,
+  // cloneObject,
   bnToBuffer,
   isHexString,
   hexOrBuffer,
@@ -487,10 +532,10 @@ module.exports = {
 
   sha3: sha3,
 
-  defineFrozen,
+  // defineFrozen,
   getKeys,
   numberOrBN,
-  zpad,
+  // zpad,
   coderNumber,
   uint256Coder,
   coderBoolean,

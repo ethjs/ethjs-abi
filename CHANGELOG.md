@@ -1,3 +1,10 @@
+# 0.0.4 -- more adjustments, stronger typing
+
+1. more adjustments
+2. stronger typing
+3. more accepting convertions
+4. more coverage
+
 # 0.0.3 -- travis fix, better testing
 
 1. Travic-CI fix
