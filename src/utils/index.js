@@ -2,12 +2,13 @@
 
 const rlp = require('rlp');
 const BN = require('bn.js');
+const BigNumber = require('bignumber.js');
 const sha3 = require('ethjs-sha3');
 const utils = require('ethjs-util');
 
 function getChecksumAddress(address) {
   if (typeof(address) !== 'string' || !address.match(/^0x[0-9A-Fa-f]{40}$/)) {
-    throw new Error('invalid address');
+    throw new Error(`[ethjs-abi] invalid address value ${JSON.stringify(address)} not a valid hex string`);
   }
 
   address = address.substring(2).toLowerCase();
@@ -29,7 +30,7 @@ function getChecksumAddress(address) {
 function getAddress(address) {
   var result = null;
 
-  if (typeof(address) !== 'string') { throw new Error('invalid address'); }
+  if (typeof(address) !== 'string') { throw new Error(`[ethjs-abi] invalid address value ${JSON.stringify(address)} not a valid hex string`); }
 
   // Missing the 0x prefix
   if (address.substring(0, 2) !== '0x' &&
@@ -47,7 +48,7 @@ function getAddress(address) {
   // Maybe ICAP? (we only support direct mode)
   } else if (address.match(/^XE[0-9]{2}[0-9A-Za-z]{30,31}$/)) {
 
-    throw new Error('ICAP and IBAN addresses, not supported yet..')
+    throw new Error('[ethjs-abi] ICAP and IBAN addresses, not supported yet..')
 
     /*
     // It is an ICAP address with a bad checksum
@@ -60,82 +61,11 @@ function getAddress(address) {
     result = getChecksumAddress('0x' + result);
     */
   } else {
-    throw new Error('invalid address');
+    throw new Error(`[ethjs-abi] invalid address value ${JSON.stringify(address)} not a valid hex string`);
   }
 
   return result;
 }
-
-/*
-// See: https://en.wikipedia.org/wiki/International_Bank_Account_Number
-var ibanChecksum = (function() {
-
-  // Create lookup table
-  var ibanLookup = {};
-  for (var i = 0; i < 10; i++) { ibanLookup[String(i)] = String(i); }
-  for (var i = 0; i < 26; i++) { ibanLookup[String.fromCharCode(65 + i)] = String(10 + i); }
-
-  // How many decimal digits can we process? (for 64-bit float, this is 15)
-  var safeDigits = Math.floor(Math.log10(Number.MAX_SAFE_INTEGER));
-
-  return function(address) {
-    address = address.toUpperCase();
-    address = address.substring(4) + address.substring(0, 2) + '00';
-
-    var expanded = address.split('');
-    for (var i = 0; i < expanded.length; i++) {
-      expanded[i] = ibanLookup[expanded[i]];
-    }
-    expanded = expanded.join('');
-
-    // Javascript can handle integers safely up to 15 (decimal) digits
-    while (expanded.length >= safeDigits){
-      var block = expanded.substring(0, safeDigits);
-      expanded = parseInt(block, 10) % 97 + expanded.substring(block.length);
-    }
-
-    var checksum = String(98 - (parseInt(expanded, 10) % 97));
-    while (checksum.length < 2) { checksum = '0' + checksum; }
-
-    return checksum;
-  };
-})();
-*/
-
-
-/*
-function getIcapAddress(address) {
-  address = getAddress(address).substring(2);
-  var base36 = (new BN(address, 16)).toString(36).toUpperCase();
-  while (base36.length < 30) { base36 = '0' + base36; }
-  return 'XE' + ibanChecksum('XE00' + base36) + base36;
-}
-
-// http://ethereum.stackexchange.com/questions/760/how-is-the-address-of-an-ethereum-contract-computed
-function getContractAddress(transaction) {
-  return getAddress('0x' + sha3(rlp.encode([
-    hexOrBuffer(getAddress(transaction.from)),
-    hexOrBuffer(hexlify(transaction.nonce, 'nonce'))
-  ]), true).slice(12).toString('hex'));
-}
-
-*/
-
-/*
-function cloneObject(object) {
-  var clone = {};
-  for (var key in object) { clone[key] = object[key]; }
-  return clone;
-}
-
-function stripZeros(buffer) {
-  var i = 0;
-  for (i = 0; i < buffer.length; i++) {
-    if (Number(buffer[i]) !== 0) { break; }
-  }
-  return (i > 0) ? buffer.slice(i): buffer;
-}
-*/
 
 // from ethereumjs-util
 function stripZeros(a) {
@@ -164,8 +94,8 @@ function isHexString(value, length) {
 function hexOrBuffer(value, name) {
   if (!Buffer.isBuffer(value)) {
     if (!isHexString(value)) {
-      var error = new Error(name ? ('invalid ' + name) : 'invalid hex or buffer, must be a prefixed alphanumeric even length hex string');
-      error.reason = 'invalid hex string, hex must be prefixed and alphanumeric (e.g. 0x023..)';
+      var error = new Error(name ? ('[ethjs-abi] invalid ' + name) : '[ethjs-abi] invalid hex or buffer, must be a prefixed alphanumeric even length hex string');
+      error.reason = '[ethjs-abi] invalid hex string, hex must be prefixed and alphanumeric (e.g. 0x023..)';
       error.value = value;
       throw error;
     }
@@ -188,26 +118,9 @@ function hexlify(value, name) {
   }
 }
 
-/*
-// Creates property that is immutable
-function defineFrozen(object, name, value) {
-  var frozen = JSON.stringify(value);
-  Object.defineProperty(object, name, {
-    enumerable: true,
-    get: function() { return JSON.parse(frozen); }
-  });
-}
-
-// Parse N from type<N>
-
-function parseTypeN (type) {
-  return parseInt(/^\D+(\d+)$/.exec(type)[1], 10);
-}
-*/
-
 // getKeys([{a: 1, b: 2}, {a: 3, b: 4}], 'a') => [1, 3]
 function getKeys(params, key, allowEmpty) {
-  if (!Array.isArray(params)) { throw new Error('invalid params'); }
+  if (!Array.isArray(params)) { throw new Error(`[ethjs-abi] while getting keys, invalid params value ${JSON.stringify(params)}`); }
 
   var result = [];
 
@@ -216,7 +129,7 @@ function getKeys(params, key, allowEmpty) {
     if (allowEmpty && !value) {
       value = '';
     } else if (typeof(value) !== 'string') {
-      throw new Error('invalid abi');
+      throw new Error('[ethjs-abi] while getKeys found invalid ABI data structure, type value not string');
     }
     result.push(value);
   }
@@ -224,23 +137,10 @@ function getKeys(params, key, allowEmpty) {
   return result;
 }
 
-// Convert the value from a Number to a BN (if necessary)
-/* function numberOrBN(value) {
-  var bnValue = value;
-  if (!value.eq) {
-    if (typeof value !== 'number') {
-      throw new Error('invalid number');
-    }
-    bnValue = new BN(value);
-  }
-  return bnValue;
-}
-*/
-
 // from ethereumjs-util
 function numberOrBN(arg) {
   var type = typeof arg;
-  if (type === 'string') {
+  if (type === 'string' && arg.indexOf('.') === -1) {
     if (utils.isHexPrefixed(arg)) {
       return new BN(utils.stripHexPrefix(arg), 16);
     } else {
@@ -248,23 +148,21 @@ function numberOrBN(arg) {
     }
   } else if (type === 'number') {
     return new BN(arg);
-  } else if (type !== 'undefined' && arg.toArray) {
-    // assume this is a BN for the moment, replace with BN.isBN soon
-    return arg;
+  } else if (type === 'object'
+    && !Array.isArray(arg)) {
+    if (arg.toString(10).indexOf('.') === -1) {
+      if (arg.toArray && arg.toTwos) {
+        return arg;
+      } else {
+        return new BN(arg.toString(10)); // if BigNumber object
+      }
+    } else {
+      throw new Error(`[ethjs-abi] while converting number to BN.js object, argument ${JSON.stringify(arg)} is not a valid number (hex or otherwise) while converting with numberOrBN method, value contains decimals (float value). Decimals are not supported.`);
+    }
   } else {
-    throw new Error(`Argument ${JSON.stringify(arg)} is not a valid number (hex or otherwise) while converting with numberOrBN method`);
+    throw new Error(`[ethjs-abi] while converting number to BN.js object, argument ${JSON.stringify(arg)} is not a valid number (hex or otherwise) while converting with numberOrBN method`);
   }
 }
-
-/*
-function zpad(buffer, length) {
-  var zero = new Buffer([0]);
-  while (buffer.length < length) {
-    buffer = Buffer.concat([zero, buffer]);
-  }
-  return buffer;
-}
-*/
 
 function coderNumber(size, signed) {
     return {
@@ -286,7 +184,7 @@ function coderNumber(size, signed) {
           }
           return {
             consumed: 32,
-            value: value,
+            value: new BigNumber(value.toString(10)),
           }
         }
     };
@@ -310,7 +208,8 @@ function coderFixedBytes(length) {
   return {
     encode: function(value) {
       value = hexOrBuffer(value);
-      if (length === 32) { return value; }
+
+      if (value.length === 32) { return value; }
 
       var result = new Buffer(32);
       result.fill(0);
@@ -318,7 +217,7 @@ function coderFixedBytes(length) {
       return result;
     },
     decode: function(data, offset) {
-      if (data.length < offset + 32) { throw new Error('invalid bytes' + length); }
+      if (data.length < offset + 32) { throw new Error('[ethjs-abi] while decoding fixed bytes, invalid bytes data length: ' + length); }
 
       return {
         consumed: 32,
@@ -330,7 +229,7 @@ function coderFixedBytes(length) {
 
 var coderAddress = {
   encode: function(value) {
-    if (!isHexString(value, 20)) { throw new Error('invalid address'); }
+    if (!isHexString(value, 20)) { throw new Error('[ethjs-abi] while encoding address, invalid address value, not alphanumeric 20 byte hex string'); }
     value = hexOrBuffer(value);
     var result = new Buffer(32);
     result.fill(0);
@@ -338,7 +237,7 @@ var coderAddress = {
     return result;
   },
   decode: function(data, offset) {
-    if (data.length < offset + 32) { throw new Error('invalid address'); }
+    if (data.length < offset + 32) { throw new Error(`[ethjs-abi] while decoding address data, invalid address data, invalid byte length ${data.length}`); }
     return {
       consumed: 32,
       value: '0x' + data.slice(offset + 12, offset + 32).toString('hex')
@@ -359,11 +258,11 @@ function _encodeDynamicBytes(value) {
 }
 
 function _decodeDynamicBytes(data, offset) {
-  if (data.length < offset + 32) { throw new Error('invalid bytes'); }
+  if (data.length < offset + 32) { throw new Error(`[ethjs-abi] while decoding dynamic bytes data, invalid bytes length: ${data.length} should be less than ${offset + 32}`); }
 
   var length = uint256Coder.decode(data, offset).value;
   length = length.toNumber();
-  if (data.length < offset + 32 + length) { throw new Error('invalid bytes'); }
+  if (data.length < offset + 32 + length) { throw new Error(`[ethjs-abi] while decoding dynamic bytes data, invalid bytes length: ${data.length} should be less than ${offset + 32 + length}`); }
 
   return {
     consumed: parseInt(32 + 32 * Math.ceil(length / 32)),
@@ -398,7 +297,7 @@ var coderString = {
 function coderArray(coder, length) {
   return {
     encode: function(value) {
-      if (!Array.isArray(value)) { throw new Error('invalid array'); }
+      if (!Array.isArray(value)) { throw new Error('[ethjs-abi] while encoding array, invalid array data, not type Object (Array)'); }
 
       var result = new Buffer(0);
       if (length === -1) {
@@ -406,7 +305,7 @@ function coderArray(coder, length) {
         result = uint256Coder.encode(length);
       }
 
-      if (length !== value.length) { throw new Error('size mismatch'); }
+      if (length !== value.length) { throw new Error(`[ethjs-abi] while encoding array, size mismatch array length ${length} does not equal ${value.length}`); }
 
       value.forEach(function(value) {
         result = Buffer.concat([
@@ -454,40 +353,41 @@ function coderArray(coder, length) {
 var paramTypePart = new RegExp(/^((u?int|bytes)([0-9]*)|(address|bool|string)|(\[([0-9]*)\]))/);
 
 function getParamCoder(type) {
+  const invalidTypeErrorMessage = `[ethjs-abi] while getting param coder (getParamCoder) type value ${JSON.stringify(type)} is either invalid or unsupported by ethjs-abi.`;
   var coder = null;
   while (type) {
     var part = type.match(paramTypePart);
-    if (!part) { throw new Error('invalid type: ' + type); }
+    if (!part) { throw new Error(invalidTypeErrorMessage); }
     type = type.substring(part[0].length);
 
     var prefix = (part[2] || part[4] || part[5]);
     switch (prefix) {
       case 'int': case 'uint':
-        if (coder) { throw new Error('invalid type ' + type); }
+        if (coder) { throw new Error(invalidTypeErrorMessage); }
         var size = parseInt(part[3] || 256);
         if (size === 0 || size > 256 || (size % 8) !== 0) {
-            throw new Error(`invalid ${prefix}<N> width: ${type}`);
+            throw new Error(`[ethjs-abi] while getting param coder for type ${type}, invalid ${prefix}<N> width: ${type}`);
         }
 
         coder = coderNumber(size / 8, (prefix === 'int'));
         break;
 
       case 'bool':
-        if (coder) { throw new Error('invalid type ' + type); }
+        if (coder) { throw new Error(invalidTypeError); }
         coder = coderBoolean;
         break;
 
       case 'string':
-        if (coder) { throw new Error('invalid type ' + type); }
+        if (coder) { throw new Error(invalidTypeErrorMessage); }
         coder = coderString;
         break;
 
       case 'bytes':
-        if (coder) { throw new Error('invalid type ' + type); }
+        if (coder) { throw new Error(invalidTypeErrorMessage); }
         if (part[3]) {
           var size = parseInt(part[3]);
           if (size === 0 || size > 32) {
-              throw new Error('invalid type ' + type);
+              throw new Error(`[ethjs-abi] while getting param coder for prefix bytes, invalid type ${type}, size ${size} should be 0 or greater than 32`);
           }
           coder = coderFixedBytes(size);
         } else {
@@ -496,34 +396,31 @@ function getParamCoder(type) {
         break;
 
       case 'address':
-        if (coder) { throw new Error('invalid type '  + type); }
+        if (coder) { throw new Error(invalidTypeErrorMessage); }
         coder = coderAddress;
         break;
 
       case '[]':
-        if (!coder || coder.dynamic) { throw new Error('invalid type ' + type); }
+        if (!coder || coder.dynamic) { throw new Error(invalidTypeErrorMessage); }
         coder = coderArray(coder, -1);
         break;
 
       // "[0-9+]"
       default:
-        if (!coder || coder.dynamic) { throw new Error('invalid type ' + type); }
+        if (!coder || coder.dynamic) { throw new Error(invalidTypeErrorMessage); }
         var size = parseInt(part[6]);
         coder = coderArray(coder, size);
     }
   }
 
-  if (!coder) { throw new Error('invalid type'); }
+  if (!coder) { throw new Error(invalidTypeErrorMessage); }
   return coder;
 }
 
 module.exports = {
   BN,
   getAddress,
-  // getIcapAddress,
   getChecksumAddress,
-  // getContractAddress,
-  // cloneObject,
   bnToBuffer,
   isHexString,
   hexOrBuffer,
@@ -532,10 +429,8 @@ module.exports = {
 
   sha3: sha3,
 
-  // defineFrozen,
   getKeys,
   numberOrBN,
-  // zpad,
   coderNumber,
   uint256Coder,
   coderBoolean,

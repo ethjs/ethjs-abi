@@ -3,17 +3,20 @@
 var chai = require('chai');
 var assert = chai.assert;
 var decodeParams = require('../index.js').decodeParams;
-var BigNumber = require('bn.js');
-var bn = BigNumber;
+var BigNumber = require('bignumber.js');
+var bn = require('bn.js');
 
 
 describe('decodeParam', function () {
     var test = function (t) {
         it(`'should turn type ${t.type} ${t.value} to ${t.expected}`, function () {
+          if(t.expected.toArray || t.expected.dividedToIntegerBy) {
+            assert.deepEqual(decodeParams([t.type], '0x' + t.value)[0].toString(10), t.expected.toString(10));
+          } else {
             assert.deepEqual(decodeParams([t.type], '0x' + t.value)[0], t.expected);
+          }
         });
     };
-
 
     test({ type: 'address', expected: '0x407d73d8a49eeb85d32cf465507dd71d507100c1',
                                                         value: '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c1'});
@@ -68,14 +71,14 @@ describe('decodeParam', function () {
                                                                '0000000000000000000000000000000000000000000000000000000000000000'});
 
     test({ type: 'int', expected: new bn(1),            value: '0000000000000000000000000000000000000000000000000000000000000001'});
-    test({ type: 'int', expected: new bn(1),            value: '0000000000000000000000000000000000000000000000000000000000000001'});
+    test({ type: 'int', expected: new BigNumber(1),     value: '0000000000000000000000000000000000000000000000000000000000000001'});
     test({ type: 'int', expected: new bn(16),           value: '0000000000000000000000000000000000000000000000000000000000000010'});
-    // test({ type: 'int', expected: new bn(-1),           value: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'});
+    test({ type: 'int', expected: new bn(-1),           value: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'});
     test({ type: 'int256', expected: new bn(1),         value: '0000000000000000000000000000000000000000000000000000000000000001'});
     test({ type: 'int256', expected: new bn(16),        value: '0000000000000000000000000000000000000000000000000000000000000010'});
-    // test({ type: 'int256', expected: new bn(-1),        value: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'});
+    test({ type: 'int256', expected: new bn(-1),        value: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'});
     test({ type: 'int8', expected: new bn(16),          value: '0000000000000000000000000000000000000000000000000000000000000010'});
-    test({ type: 'int8[2]', expected: [new bn(16), new bn(2)],
+    test({ type: 'int8[2]', expected: [new BigNumber(16), new BigNumber(2)],
                                                         value: '0000000000000000000000000000000000000000000000000000000000000010' +
                                                                '0000000000000000000000000000000000000000000000000000000000000002'});
     test({ type: 'int32', expected: new bn(16),         value: '0000000000000000000000000000000000000000000000000000000000000010'});
@@ -83,19 +86,19 @@ describe('decodeParam', function () {
     test({ type: 'int128', expected: new bn(16),        value: '0000000000000000000000000000000000000000000000000000000000000010'});
     test({ type: 'int[]', expected: [],                 value: '0000000000000000000000000000000000000000000000000000000000000020' +
                                                                '0000000000000000000000000000000000000000000000000000000000000000'});
-    test({ type: 'int[]', expected: [new bn(3)],        value: '0000000000000000000000000000000000000000000000000000000000000020' +
+    test({ type: 'int[]', expected: [new BigNumber(3)],        value: '0000000000000000000000000000000000000000000000000000000000000020' +
                                                                '0000000000000000000000000000000000000000000000000000000000000001' +
                                                                '0000000000000000000000000000000000000000000000000000000000000003'});
-    test({ type: 'int256[]', expected: [new bn(3)],     value: '0000000000000000000000000000000000000000000000000000000000000020' +
+    test({ type: 'int256[]', expected: [new BigNumber(3)],     value: '0000000000000000000000000000000000000000000000000000000000000020' +
                                                                '0000000000000000000000000000000000000000000000000000000000000001' +
                                                                '0000000000000000000000000000000000000000000000000000000000000003'});
-    test({ type: 'int[]', expected: [new bn(1), new bn(2), new bn(3)],
+    test({ type: 'int[]', expected: [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
                                                         value: '0000000000000000000000000000000000000000000000000000000000000020' +
                                                                '0000000000000000000000000000000000000000000000000000000000000003' +
                                                                '0000000000000000000000000000000000000000000000000000000000000001' +
                                                                '0000000000000000000000000000000000000000000000000000000000000002' +
                                                                '0000000000000000000000000000000000000000000000000000000000000003'});
-    test({ type: 'int[3][]', expected: [[new bn(1), new bn(2), new bn(3)], [new bn(4), new bn(5), new bn(6)]],
+    test({ type: 'int[3][]', expected: [[new BigNumber(1), new BigNumber(2), new BigNumber(3)], [new BigNumber(4), new BigNumber(5), new BigNumber(6)]],
                                                         value: '0000000000000000000000000000000000000000000000000000000000000020' +
                                                                '0000000000000000000000000000000000000000000000000000000000000002' +
                                                                '0000000000000000000000000000000000000000000000000000000000000001' +
@@ -108,8 +111,8 @@ describe('decodeParam', function () {
     test({ type: 'uint', expected: new bn(1),           value: '0000000000000000000000000000000000000000000000000000000000000001'});
     test({ type: 'uint', expected: new bn(1),           value: '0000000000000000000000000000000000000000000000000000000000000001'});
     test({ type: 'uint', expected: new bn(16),          value: '0000000000000000000000000000000000000000000000000000000000000010'});
-    // test({ type: 'uint', expected: new bn('0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'),
-    //                                                    value: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'});
+    test({ type: 'uint', expected: new bn('ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff', 'hex'),
+                                                        value: 'ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff'});
     test({ type: 'uint256', expected: new bn(1),        value: '0000000000000000000000000000000000000000000000000000000000000001'});
     test({ type: 'uint256', expected: new bn(16),       value: '0000000000000000000000000000000000000000000000000000000000000010'});
     test({ type: 'uint8', expected: new bn(16),         value: '0000000000000000000000000000000000000000000000000000000000000010'});
@@ -118,19 +121,19 @@ describe('decodeParam', function () {
     test({ type: 'uint128', expected: new bn(16),       value: '0000000000000000000000000000000000000000000000000000000000000010'});
     test({ type: 'uint[]', expected: [],                value: '0000000000000000000000000000000000000000000000000000000000000020' +
                                                                '0000000000000000000000000000000000000000000000000000000000000000'});
-    test({ type: 'uint[]', expected: [new bn(3)],       value: '0000000000000000000000000000000000000000000000000000000000000020' +
+    test({ type: 'uint[]', expected: [new BigNumber(3)],       value: '0000000000000000000000000000000000000000000000000000000000000020' +
                                                                '0000000000000000000000000000000000000000000000000000000000000001' +
                                                                '0000000000000000000000000000000000000000000000000000000000000003'});
-    test({ type: 'uint256[]', expected: [new bn(3)],    value: '0000000000000000000000000000000000000000000000000000000000000020' +
+    test({ type: 'uint256[]', expected: [new BigNumber(3)],    value: '0000000000000000000000000000000000000000000000000000000000000020' +
                                                                '0000000000000000000000000000000000000000000000000000000000000001' +
                                                                '0000000000000000000000000000000000000000000000000000000000000003'});
-    test({ type: 'uint[]', expected: [new bn(1), new bn(2), new bn(3)],
+    test({ type: 'uint[]', expected: [new BigNumber(1), new BigNumber(2), new BigNumber(3)],
                                                         value: '0000000000000000000000000000000000000000000000000000000000000020' +
                                                                '0000000000000000000000000000000000000000000000000000000000000003' +
                                                                '0000000000000000000000000000000000000000000000000000000000000001' +
                                                                '0000000000000000000000000000000000000000000000000000000000000002' +
                                                                '0000000000000000000000000000000000000000000000000000000000000003'});
-    test({ type: 'uint[3][]', expected: [[new bn(1), new bn(2), new bn(3)], [new bn(4), new bn(5), new bn(6)]],
+    test({ type: 'uint[3][]', expected: [[new BigNumber(1), new BigNumber(2), new BigNumber(3)], [new BigNumber(4), new BigNumber(5), new BigNumber(6)]],
                                                         value: '0000000000000000000000000000000000000000000000000000000000000020' +
                                                                '0000000000000000000000000000000000000000000000000000000000000002' +
                                                                '0000000000000000000000000000000000000000000000000000000000000001' +
@@ -223,13 +226,13 @@ describe('decodeParam', function () {
                                                                'c3a40000c3a40000000000000000000000000000000000000000000000000000'});
     test({ type: 'bytes32', expected: '0xc3a40000c3a40000000000000000000000000000000000000000000000000000',
                                                         value: 'c3a40000c3a40000000000000000000000000000000000000000000000000000'});
-    //test({ type: 'real', expected: new bn(1),           value: '0000000000000000000000000000000100000000000000000000000000000000'});
-    //test({ type: 'real', expected: new bn(2.125),       value: '0000000000000000000000000000000220000000000000000000000000000000'});
-    //test({ type: 'real', expected: new bn(8.5),         value: '0000000000000000000000000000000880000000000000000000000000000000'});
-    //test({ type: 'real', expected: new bn(-1),          value: 'ffffffffffffffffffffffffffffffff00000000000000000000000000000000'});
-    //test({ type: 'ureal', expected: new bn(1),          value: '0000000000000000000000000000000100000000000000000000000000000000'});
-    //test({ type: 'ureal', expected: new bn(2.125),      value: '0000000000000000000000000000000220000000000000000000000000000000'});
-    //test({ type: 'ureal', expected: new bn(8.5),        value: '0000000000000000000000000000000880000000000000000000000000000000'});
+    // test({ type: 'real', expected: new bn(1),           value: '0000000000000000000000000000000100000000000000000000000000000000'});
+    // test({ type: 'real', expected: new bn(2.125),       value: '0000000000000000000000000000000220000000000000000000000000000000'});
+    // test({ type: 'real', expected: new bn(8.5),         value: '0000000000000000000000000000000880000000000000000000000000000000'});
+    // test({ type: 'real', expected: new bn(-1),          value: 'ffffffffffffffffffffffffffffffff00000000000000000000000000000000'});
+    // test({ type: 'ureal', expected: new bn(1),          value: '0000000000000000000000000000000100000000000000000000000000000000'});
+    // test({ type: 'ureal', expected: new bn(2.125),      value: '0000000000000000000000000000000220000000000000000000000000000000'});
+    // test({ type: 'ureal', expected: new bn(8.5),        value: '0000000000000000000000000000000880000000000000000000000000000000'});
     test({ type: 'address', expected: '0x407d73d8a49eeb85d32cf465507dd71d507100c1',
                                                         value: '000000000000000000000000407d73d8a49eeb85d32cf465507dd71d507100c1'});
     test({ type: 'string', expected: 'welcome to ethereum. welcome to ethereum. welcome to ethereum.',

@@ -3,6 +3,7 @@
 const assert = require('chai').assert;
 // var abi = require('../index.js');
 const BN = require('bn.js');
+const BigNumber = require('bignumber.js');
 const encodeParams = require('../index.js').encodeParams;
 const decodeParams = require('../index.js').decodeParams;
 
@@ -93,7 +94,7 @@ describe('encoding negative int32', function () {
 
 describe('encoding negative int256', function () {
   it('should equal', function () {
-    var a = abi.rawEncode([ 'int256' ], [ new BN('-19999999999999999999999999999999999999999999999999999999999999', 10) ]).toString('hex')
+    var a = abi.rawEncode([ 'int256' ], [ new BigNumber('-19999999999999999999999999999999999999999999999999999999999999', 10) ]).toString('hex')
     var b = 'fffffffffffff38dd0f10627f5529bdb2c52d4846810af0ac000000000000001'
     assert.equal(a, b)
   })
@@ -204,7 +205,7 @@ describe('encoding uint8 with 9bit data', function () {
 describe('decoding uint32', function () {
   it('should equal', function () {
     var a = abi.rawDecode([ 'uint32' ], new Buffer('000000000000000000000000000000000000000000000000000000000000002a', 'hex'))
-    var b = new BN(42)
+    var b = new BigNumber(42)
     assert.equal(Object.keys(a).length, 1)
     assert.equal(a[0].toString(), b.toString())
   })
@@ -214,7 +215,7 @@ describe('decoding uint256[]', function () {
   it('should equal', function () {
     var a = abi.rawDecode([ 'uint256[]' ], new Buffer('00000000000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000003000000000000000000000000000000000000000000000000000000000000000100000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000003', 'hex'))
     var b = new BN(1)
-    var c = new BN(2)
+    var c = new BigNumber(2)
     var d = new BN(3)
 
     assert.equal(Object.keys(a).length, 1)
@@ -247,7 +248,7 @@ describe('decoding string', function () {
 describe('decoding int32', function () {
   it('should equal', function () {
     var a = abi.rawDecode([ 'int32' ], new Buffer('fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe', 'hex'))
-    var b = new BN(-2)
+    var b = new BigNumber(-2)
     assert.equal(Object.keys(a).length, 1)
     assert.equal(a[0].toString(), b.toString())
 

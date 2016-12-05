@@ -15,7 +15,7 @@ function Result() {}
 
 function encodeParams(types, values) {
   if (types.length !== values.length) {
-    throw new Error('types/values mismatch');
+    throw new Error(`[ethjs-abi] while encoding params, types/values mismatch, types length ${types.length} should be ${values.length}`);
   }
 
   var parts = [];

@@ -1,3 +1,11 @@
+# 0.0.5 -- complete BigNumber support
+
+1. Complete BigNumber object support in and out
+2. Fix bytes32 padding bug
+3. More test coverage across the board
+4. Better error handling
+5. Package config updates
+
 # 0.0.4 -- more adjustments, stronger typing
 
 1. more adjustments

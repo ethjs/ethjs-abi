@@ -1,6 +1,7 @@
 const assert = require('chai').assert;
 const utils = require('../utils/index.js');
 const BN = require('bn.js');
+const BigNumber = require('bignumber.js');
 
 describe('test utilty methods', () => {
   describe('stripZeros', () => {
@@ -20,6 +21,14 @@ describe('test utilty methods', () => {
   });
 
   describe('numberOrBN', () => {
+    it('should convert BigNumber number to BN', () => {
+      assert.deepEqual(utils.numberOrBN(new BigNumber(1000)).toNumber(10), 1000);
+    });
+
+    it('should throw with decimal BigNumber', () => {
+      assert.throws(() => utils.numberOrBN(new BigNumber('100.002')), Error);
+    });
+
     it('should convert hexified number', () => {
       assert.deepEqual(utils.numberOrBN('0x0a').toString(10), (new BN('0a')).toString(10));
     });
@@ -68,6 +77,10 @@ describe('test utilty methods', () => {
 
     it('should throw when invalid sol type stringint2', () => {
       assert.throws(() => utils.getParamCoder('stringint2'), Error);
+    });
+
+    it('should throw when invalid sol type uint[==-3-]', () => {
+      assert.throws(() => utils.getParamCoder('real'), Error);
     });
 
     it('should throw when invalid sol type uint8bool', () => {
@@ -122,6 +135,10 @@ describe('test utilty methods', () => {
 
     it('invalid dynamic bytes decode should throw', () => {
       assert.throws(() => utils.coderDynamicBytes.decode('asddsdfsfd', 0), Error);
+    });
+
+    it('invalid dynamic bytes decode should throw', () => {
+      assert.throws(() => { utils.coderDynamicBytes.decode('0a', 5000); }, Error);
     });
   });
 

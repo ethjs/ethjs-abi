@@ -43,7 +43,7 @@ Note, this package is experimental, and is not ready for production use.
 
 ## Usage
 
-```
+```js
 const abi = require('ethjs-abi');
 const SimpleStoreABI = [{"constant":false,"inputs":[{"name":"_value","type":"uint256"}],"name":"set","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"get","outputs":[{"name":"storeValue","type":"uint256"}],"payable":false,"type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_newValue","type":"uint256"},{"indexed":false,"name":"_sender","type":"address"}],"name":"SetComplete","type":"event"}];
 
@@ -64,7 +64,7 @@ const getInputBytecode = abi.encodeMethod(SimpleStoreABI[1], []);
 
 const getMethodOutputBytecode = abi.decodeMethod(SimpleStoreABI[1], "0x000000000000000000000000000000000000000000000000000000000000b26e");
 
-// returns Result { '0': <BN: b26e>, storeValue: <BN: b26e> }
+// returns Result { '0': <BigNumber: b26e>, storeValue: <BigNumber: b26e> }
 
 
 
@@ -75,9 +75,9 @@ const SetCompleteInputBytecode = abi.encodeEvent(SimpleStoreABI[2], [24000, "0xc
 const SetCompleteOutputBytecode = abi.decodeEvent(SimpleStoreABI[2], "0x0000000000000000000000000000000000000000000000000000000000000d7d000000000000000000000000ca35b7d915458ef540ade6068dfe2f44e8fa733c");
 
 /* returns   Result {
-  '0': <BN: d7d>,
+  '0': <BigNumber: d7d>,
   '1': '0xca35b7d915458ef540ade6068dfe2f44e8fa733c',
-  _newValue: <BN: d7d>,
+  _newValue: <BigNumber: d7d>,
   _sender: '0xca35b7d915458ef540ade6068dfe2f44e8fa733c' }
 */
 ```
@@ -114,14 +114,12 @@ Just the encoding and decoding of contract data.
 
 Please help better the ecosystem by submitting issues and pull requests to default. We need all the help we can get to build the absolute best linting standards and utilities. We follow the AirBNB linting standard and the unix philosophy.
 
-<!--
 ## Guides
 
-You'll find more detailed information on using default and tailoring it to your needs in our guides:
+You'll find more detailed information on using `ethjs-abi` and tailoring it to your needs in our guides:
 
 - [User guide](docs/user-guide.md) - Usage, configuration, FAQ and complementary tools.
-- [Developer guide](docs/developer-guide.md) - Contributing to wafr and writing your own plugins & formatters.
--->
+- [Developer guide](docs/developer-guide.md) - Contributing to `ethjs-abi` and writing your own code and coverage.
 
 ## Help out
 
