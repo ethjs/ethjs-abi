@@ -6,9 +6,9 @@ var BN = require('bn.js');
 
 describe('encodeParam', function () {
           var test = function test(t) {
-                    it('should turn type ' + t.type + ' ' + t.value + ' to 0x' + t.expected, function () {
-                              assert.equal(encodeParams([t.type], [t.value]), '0x' + t.expected);
-                    });
+              it('should turn type ' + t.type + ' ' + t.value + ' to 0x' + t.expected, function () {
+                  assert.equal(encodeParams([t.type], [t.value]), '0x' + t.expected);
+              });
           };
 
           test({ type: 'address', value: '0x407d73d8a49eeb85d32cf465507dd71d507100c1',

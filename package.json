@@ -1,6 +1,6 @@
 {
   "name": "ethjs-abi",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Just the Ethereum encoding and decoding methods from the ethers-io-wallet.",
   "main": "lib/index.js",
   "browser": "dist/ethjs-abi.js",
@@ -69,12 +69,10 @@
   "dependencies": {
     "bn.js": "4.11.6",
     "ethjs-sha3": "0.1.1",
-    "ethjs-util": "0.1.1",
-    "bignumber.js": "3.0.1",
-    "hash.js": "1.0.3",
-    "rlp": "2.0.0"
+    "number-to-bn": "1.2.0"
   },
   "devDependencies": {
+    "bignumber.js": "3.0.1",
     "babel-cli": "6.18.0",
     "babel-core": "6.18.2",
     "babel-eslint": "7.1.0",
@@ -175,5 +173,5 @@
       ]
     }
   },
-  "pre-commit": "lint:staged"
+  "pre-commit": "build"
 }

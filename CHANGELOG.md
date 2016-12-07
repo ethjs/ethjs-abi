@@ -1,3 +1,10 @@
+# 0.1.2 -- removal of BigNumber for BN
+
+1. Removal of BigNumber for BN (see `user-guide` for more)
+2. More docs
+3. More coverage
+4. package config fixes
+
 # 0.0.5 -- complete BigNumber support
 
 1. Complete BigNumber object support in and out

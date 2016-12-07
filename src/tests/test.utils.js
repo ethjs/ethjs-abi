@@ -1,7 +1,6 @@
 const assert = require('chai').assert;
 const utils = require('../utils/index.js');
 const BN = require('bn.js');
-const BigNumber = require('bignumber.js');
 
 describe('test utilty methods', () => {
   describe('stripZeros', () => {
@@ -17,32 +16,6 @@ describe('test utilty methods', () => {
   describe('bnToBuffer', () => {
     it('bnToBuffer', () => {
       assert.deepEqual(utils.bnToBuffer(new BN(10)), (new Buffer(`0${(new BN(10)).toString(16)}`, 'hex')));
-    });
-  });
-
-  describe('numberOrBN', () => {
-    it('should convert BigNumber number to BN', () => {
-      assert.deepEqual(utils.numberOrBN(new BigNumber(1000)).toNumber(10), 1000);
-    });
-
-    it('should throw with decimal BigNumber', () => {
-      assert.throws(() => utils.numberOrBN(new BigNumber('100.002')), Error);
-    });
-
-    it('should convert hexified number', () => {
-      assert.deepEqual(utils.numberOrBN('0x0a').toString(10), (new BN('0a')).toString(10));
-    });
-
-    it('should convert non hexified string', () => {
-      assert.deepEqual(utils.numberOrBN('10').toString(10), (new BN('0a')).toString(10));
-    });
-
-    it('should convert not a number', () => {
-      assert.throws(() => utils.numberOrBN([]), Error);
-    });
-
-    it('should convert not a number', () => {
-      assert.throws(() => utils.numberOrBN(undefined), Error);
     });
   });
 

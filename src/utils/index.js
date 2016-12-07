@@ -1,21 +1,19 @@
-/* eslint-disable */
-
-const rlp = require('rlp');
 const BN = require('bn.js');
-const BigNumber = require('bignumber.js');
 const sha3 = require('ethjs-sha3');
-const utils = require('ethjs-util');
+const numberToBN = require('number-to-bn');
 
-function getChecksumAddress(address) {
+function getChecksumAddress(addressInput) {
+  var address = addressInput; // eslint-disable-line
+
   if (typeof(address) !== 'string' || !address.match(/^0x[0-9A-Fa-f]{40}$/)) {
     throw new Error(`[ethjs-abi] invalid address value ${JSON.stringify(address)} not a valid hex string`);
   }
 
   address = address.substring(2).toLowerCase();
-  var hashed = sha3(address, true);
+  const hashed = sha3(address, true);
 
   address = address.split('');
-  for (var i = 0; i < 40; i += 2) {
+  for (var i = 0; i < 40; i += 2) { // eslint-disable-line
     if ((hashed[i >> 1] >> 4) >= 8) {
       address[i] = address[i].toUpperCase();
     }
@@ -24,20 +22,20 @@ function getChecksumAddress(address) {
     }
   }
 
-  return '0x' + address.join('');
+  return `0x${address.join('')}`;
 }
 
-function getAddress(address) {
-  var result = null;
+function getAddress(addressInput) {
+  var address = addressInput; // eslint-disable-line
+  var result = null; // eslint-disable-line
 
   if (typeof(address) !== 'string') { throw new Error(`[ethjs-abi] invalid address value ${JSON.stringify(address)} not a valid hex string`); }
 
   // Missing the 0x prefix
   if (address.substring(0, 2) !== '0x' &&
-      address.substring(0, 2) !== 'XE') { address = '0x' + address; }
+      address.substring(0, 2) !== 'XE') { address = `0x${address}`; }
 
   if (address.match(/^(0x)?[0-9a-fA-F]{40}$/)) {
-
     result = getChecksumAddress(address);
 
     // It is a checksummed address with a bad checksum
@@ -47,8 +45,7 @@ function getAddress(address) {
 
   // Maybe ICAP? (we only support direct mode)
   } else if (address.match(/^XE[0-9]{2}[0-9A-Za-z]{30,31}$/)) {
-
-    throw new Error('[ethjs-abi] ICAP and IBAN addresses, not supported yet..')
+    throw new Error('[ethjs-abi] ICAP and IBAN addresses, not supported yet..');
 
     /*
     // It is an ICAP address with a bad checksum
@@ -68,8 +65,9 @@ function getAddress(address) {
 }
 
 // from ethereumjs-util
-function stripZeros(a) {
-  var first = a[0];
+function stripZeros(aInput) {
+  var a = aInput; // eslint-disable-line
+  var first = a[0]; // eslint-disable-line
   while (a.length > 0 && first.toString() === '0') {
     a = a.slice(1);
     first = a[0];
@@ -77,9 +75,10 @@ function stripZeros(a) {
   return a;
 }
 
-function bnToBuffer(bn) {
-  var hex = bn.toString(16);
-  if (hex.length % 2) { hex = '0' + hex; }
+function bnToBuffer(bnInput) {
+  var bn = bnInput; // eslint-disable-line
+  var hex = bn.toString(16); // eslint-disable-line
+  if (hex.length % 2) { hex = `0${hex}`; }
   return stripZeros(new Buffer(hex, 'hex'));
 }
 
@@ -91,41 +90,42 @@ function isHexString(value, length) {
   return true;
 }
 
-function hexOrBuffer(value, name) {
+function hexOrBuffer(valueInput, name) {
+  var value = valueInput; // eslint-disable-line
   if (!Buffer.isBuffer(value)) {
     if (!isHexString(value)) {
-      var error = new Error(name ? ('[ethjs-abi] invalid ' + name) : '[ethjs-abi] invalid hex or buffer, must be a prefixed alphanumeric even length hex string');
+      const error = new Error(name ? (`[ethjs-abi] invalid ${name}`) : '[ethjs-abi] invalid hex or buffer, must be a prefixed alphanumeric even length hex string');
       error.reason = '[ethjs-abi] invalid hex string, hex must be prefixed and alphanumeric (e.g. 0x023..)';
       error.value = value;
       throw error;
     }
 
     value = value.substring(2);
-    if (value.length % 2) { value = '0' + value; }
+    if (value.length % 2) { value = `0${value}`; }
     value = new Buffer(value, 'hex');
   }
 
   return value;
 }
 
-function hexlify(value, name) {
+function hexlify(value) {
   if (typeof(value) === 'number') {
-    return '0x' + bnToBuffer(new BN(value)).toString('hex');
+    return `0x${bnToBuffer(new BN(value)).toString('hex')}`;
   } else if (value.mod || value.modulo) {
-    return '0x' + bnToBuffer(value).toString('hex');
-  } else {
-    return '0x' + hexOrBuffer(value).toString('hex');
+    return `0x${bnToBuffer(value).toString('hex')}`;
+  } else { // eslint-disable-line
+    return `0x${hexOrBuffer(value).toString('hex')}`;
   }
 }
 
 // getKeys([{a: 1, b: 2}, {a: 3, b: 4}], 'a') => [1, 3]
 function getKeys(params, key, allowEmpty) {
+  var result = []; // eslint-disable-line
+
   if (!Array.isArray(params)) { throw new Error(`[ethjs-abi] while getting keys, invalid params value ${JSON.stringify(params)}`); }
 
-  var result = [];
-
-  for (var i = 0; i < params.length; i++) {
-    var value = params[i][key];
+  for (var i = 0; i < params.length; i++) { // eslint-disable-line
+    var value = params[i][key];  // eslint-disable-line
     if (allowEmpty && !value) {
       value = '';
     } else if (typeof(value) !== 'string') {
@@ -137,169 +137,158 @@ function getKeys(params, key, allowEmpty) {
   return result;
 }
 
-// from ethereumjs-util
-function numberOrBN(arg) {
-  var type = typeof arg;
-  if (type === 'string' && arg.indexOf('.') === -1) {
-    if (utils.isHexPrefixed(arg)) {
-      return new BN(utils.stripHexPrefix(arg), 16);
-    } else {
-      return new BN(arg, 10);
-    }
-  } else if (type === 'number') {
-    return new BN(arg);
-  } else if (type === 'object'
-    && !Array.isArray(arg)) {
-    if (arg.toString(10).indexOf('.') === -1) {
-      if (arg.toArray && arg.toTwos) {
-        return arg;
-      } else {
-        return new BN(arg.toString(10)); // if BigNumber object
-      }
-    } else {
-      throw new Error(`[ethjs-abi] while converting number to BN.js object, argument ${JSON.stringify(arg)} is not a valid number (hex or otherwise) while converting with numberOrBN method, value contains decimals (float value). Decimals are not supported.`);
-    }
-  } else {
-    throw new Error(`[ethjs-abi] while converting number to BN.js object, argument ${JSON.stringify(arg)} is not a valid number (hex or otherwise) while converting with numberOrBN method`);
-  }
-}
-
 function coderNumber(size, signed) {
-    return {
-        encode: function(value) {
-          value = numberOrBN(value);
-          value = value.toTwos(size * 8).maskn(size * 8);
-          if (signed) {
-            value = value.fromTwos(size * 8).toTwos(256);
-          }
-          return value.toArrayLike(Buffer, 'be', 32);
-        },
-        decode: function(data, offset) {
-          var junkLength = 32 - size;
-          var value = new BN(data.slice(offset + junkLength, offset + 32));
-          if (signed) {
-            value = value.fromTwos(size * 8);
-          } else {
-            value = value.maskn(size * 8);
-          }
-          return {
-            consumed: 32,
-            value: new BigNumber(value.toString(10)),
-          }
-        }
-    };
-}
-var uint256Coder = coderNumber(32, false);
+  return {
+    encode: function encodeNumber(valueInput) {
+      var value = valueInput; // eslint-disable-line
 
-var coderBoolean = {
-  encode: function(value) {
-    return uint256Coder.encode(value ? 1: 0);
+      if (typeof value === 'object'
+        && value.toString
+        && (value.toTwos || value.dividedToIntegerBy)) {
+        value = (value.toString(10)).split('.')[0];
+      }
+
+      if (typeof value === 'string' || typeof value === 'number') {
+        value = String(value).split('.')[0];
+      }
+
+      value = numberToBN(value);
+      value = value.toTwos(size * 8).maskn(size * 8);
+      if (signed) {
+        value = value.fromTwos(size * 8).toTwos(256);
+      }
+      return value.toArrayLike(Buffer, 'be', 32);
+    },
+    decode: function decodeNumber(data, offset) {
+      var junkLength = 32 - size; // eslint-disable-line
+      var value = new BN(data.slice(offset + junkLength, offset + 32)); // eslint-disable-line
+      if (signed) {
+        value = value.fromTwos(size * 8);
+      } else {
+        value = value.maskn(size * 8);
+      }
+      return {
+        consumed: 32,
+        value: new BN(value.toString(10)),
+      };
+    },
+  };
+}
+const uint256Coder = coderNumber(32, false);
+
+const coderBoolean = {
+  encode: function encodeBoolean(value) {
+    return uint256Coder.encode(value ? 1 : 0);
   },
-  decode: function(data, offset) {
-    var result = uint256Coder.decode(data, offset);
+  decode: function decodeBoolean(data, offset) {
+    var result = uint256Coder.decode(data, offset); // eslint-disable-line
     return {
       consumed: result.consumed,
-      value: !result.value.isZero()
-    }
-  }
-}
+      value: !result.value.isZero(),
+    };
+  },
+};
 
 function coderFixedBytes(length) {
   return {
-    encode: function(value) {
+    encode: function encodeFixedBytes(valueInput) {
+      var value = valueInput; // eslint-disable-line
       value = hexOrBuffer(value);
 
       if (value.length === 32) { return value; }
 
-      var result = new Buffer(32);
+      var result = new Buffer(32); // eslint-disable-line
       result.fill(0);
       value.copy(result);
       return result;
     },
-    decode: function(data, offset) {
-      if (data.length < offset + 32) { throw new Error('[ethjs-abi] while decoding fixed bytes, invalid bytes data length: ' + length); }
+    decode: function decodeFixedBytes(data, offset) {
+      if (data.length < offset + 32) { throw new Error(`[ethjs-abi] while decoding fixed bytes, invalid bytes data length: ${length}`); }
 
       return {
         consumed: 32,
-        value: '0x' + data.slice(offset, offset + length).toString('hex')
-      }
-    }
+        value: `0x${data.slice(offset, offset + length).toString('hex')}`,
+      };
+    },
   };
 }
 
-var coderAddress = {
-  encode: function(value) {
+const coderAddress = {
+  encode: function encodeAddress(valueInput) {
+    var value = valueInput; // eslint-disable-line
+    var result = new Buffer(32); // eslint-disable-line
     if (!isHexString(value, 20)) { throw new Error('[ethjs-abi] while encoding address, invalid address value, not alphanumeric 20 byte hex string'); }
     value = hexOrBuffer(value);
-    var result = new Buffer(32);
     result.fill(0);
     value.copy(result, 12);
     return result;
   },
-  decode: function(data, offset) {
+  decode: function decodeAddress(data, offset) {
     if (data.length < offset + 32) { throw new Error(`[ethjs-abi] while decoding address data, invalid address data, invalid byte length ${data.length}`); }
     return {
       consumed: 32,
-      value: '0x' + data.slice(offset + 12, offset + 32).toString('hex')
-    }
-  }
-}
+      value: `0x${data.slice(offset + 12, offset + 32).toString('hex')}`,
+    };
+  },
+};
 
-function _encodeDynamicBytes(value) {
-  var dataLength = parseInt(32 * Math.ceil(value.length / 32));
-  var padding = new Buffer(dataLength - value.length);
+function encodeDynamicBytesHelper(value) {
+  var dataLength = parseInt(32 * Math.ceil(value.length / 32)); // eslint-disable-line
+  var padding = new Buffer(dataLength - value.length); // eslint-disable-line
   padding.fill(0);
 
   return Buffer.concat([
     uint256Coder.encode(value.length),
     value,
-    padding
+    padding,
   ]);
 }
 
-function _decodeDynamicBytes(data, offset) {
+function decodeDynamicBytesHelper(data, offset) {
   if (data.length < offset + 32) { throw new Error(`[ethjs-abi] while decoding dynamic bytes data, invalid bytes length: ${data.length} should be less than ${offset + 32}`); }
 
-  var length = uint256Coder.decode(data, offset).value;
+  var length = uint256Coder.decode(data, offset).value; // eslint-disable-line
   length = length.toNumber();
   if (data.length < offset + 32 + length) { throw new Error(`[ethjs-abi] while decoding dynamic bytes data, invalid bytes length: ${data.length} should be less than ${offset + 32 + length}`); }
 
   return {
-    consumed: parseInt(32 + 32 * Math.ceil(length / 32)),
+    consumed: parseInt(32 + 32 * Math.ceil(length / 32), 10),
     value: data.slice(offset + 32, offset + 32 + length),
-  }
+  };
 }
 
-var coderDynamicBytes = {
-  encode: function(value) {
-    return _encodeDynamicBytes(hexOrBuffer(value));
+const coderDynamicBytes = {
+  encode: function encodeDynamicBytes(value) {
+    return encodeDynamicBytesHelper(hexOrBuffer(value));
   },
-  decode: function(data, offset) {
-    var result = _decodeDynamicBytes(data, offset);
-    result.value = '0x' + result.value.toString('hex');
+  decode: function decodeDynamicBytes(data, offset) {
+    var result = decodeDynamicBytesHelper(data, offset); // eslint-disable-line
+    result.value = `0x${result.value.toString('hex')}`;
     return result;
   },
-  dynamic: true
+  dynamic: true,
 };
 
-var coderString = {
-  encode: function(value) {
-    return _encodeDynamicBytes(new Buffer(value, 'utf8'));
+const coderString = {
+  encode: function encodeString(value) {
+    return encodeDynamicBytesHelper(new Buffer(value, 'utf8'));
   },
-  decode: function(data, offset) {
-    var result = _decodeDynamicBytes(data, offset);
+  decode: function decodeString(data, offset) {
+    var result = decodeDynamicBytesHelper(data, offset); // eslint-disable-line
     result.value = result.value.toString('utf8');
     return result;
   },
-  dynamic: true
+  dynamic: true,
 };
 
-function coderArray(coder, length) {
+function coderArray(coder, lengthInput) {
   return {
-    encode: function(value) {
+    encode: function encodeArray(value) {
+      var result = new Buffer(0); // eslint-disable-line
+      var length = lengthInput; // eslint-disable-line
+
       if (!Array.isArray(value)) { throw new Error('[ethjs-abi] while encoding array, invalid array data, not type Object (Array)'); }
 
-      var result = new Buffer(0);
       if (length === -1) {
         length = value.length;
         result = uint256Coder.encode(length);
@@ -307,73 +296,77 @@ function coderArray(coder, length) {
 
       if (length !== value.length) { throw new Error(`[ethjs-abi] while encoding array, size mismatch array length ${length} does not equal ${value.length}`); }
 
-      value.forEach(function(value) {
+      value.forEach((resultValue) => {
         result = Buffer.concat([
           result,
-          coder.encode(value)
+          coder.encode(resultValue),
         ]);
       });
 
       return result;
     },
-    decode: function(data, offset) {
+    decode: function decodeArray(data, offsetInput) {
+      var length = lengthInput; // eslint-disable-line
+      var offset = offsetInput; // eslint-disable-line
       // @TODO:
-      //if (data.length < offset + length * 32) { throw new Error('invalid array'); }
+      // if (data.length < offset + length * 32) { throw new Error('invalid array'); }
 
-      var consumed = 0;
+      var consumed = 0; // eslint-disable-line
+      var decodeResult; // eslint-disable-line
 
-      var result;
       if (length === -1) {
-         result = uint256Coder.decode(data, offset);
-         length = result.value.toNumber();
-         consumed += result.consumed;
-         offset += result.consumed;
+        decodeResult = uint256Coder.decode(data, offset);
+        length = decodeResult.value.toNumber();
+        consumed += decodeResult.consumed;
+        offset += decodeResult.consumed;
       }
 
-      var value = [];
+      var value = []; // eslint-disable-line
 
-      for (var i = 0; i < length; i++) {
-        var result = coder.decode(data, offset);
-        consumed += result.consumed;
-        offset += result.consumed;
-        value.push(result.value);
+      for (var i = 0; i < length; i++) { // eslint-disable-line
+        const loopResult = coder.decode(data, offset);
+        consumed += loopResult.consumed;
+        offset += loopResult.consumed;
+        value.push(loopResult.value);
       }
 
       return {
-        consumed: consumed,
-        value: value,
-      }
+        consumed,
+        value,
+      };
     },
-    dynamic: (length === -1)
-  }
+    dynamic: (lengthInput === -1),
+  };
 }
 
 // Break the type up into [staticType][staticArray]*[dynamicArray]? | [dynamicType] and
 // build the coder up from its parts
-var paramTypePart = new RegExp(/^((u?int|bytes)([0-9]*)|(address|bool|string)|(\[([0-9]*)\]))/);
+const paramTypePart = new RegExp(/^((u?int|bytes)([0-9]*)|(address|bool|string)|(\[([0-9]*)\]))/);
 
-function getParamCoder(type) {
+function getParamCoder(typeInput) {
+  var type = typeInput; // eslint-disable-line
+  var coder = null; // eslint-disable-line
   const invalidTypeErrorMessage = `[ethjs-abi] while getting param coder (getParamCoder) type value ${JSON.stringify(type)} is either invalid or unsupported by ethjs-abi.`;
-  var coder = null;
+
   while (type) {
-    var part = type.match(paramTypePart);
+    var part = type.match(paramTypePart); // eslint-disable-line
     if (!part) { throw new Error(invalidTypeErrorMessage); }
     type = type.substring(part[0].length);
 
-    var prefix = (part[2] || part[4] || part[5]);
+    var prefix = (part[2] || part[4] || part[5]); // eslint-disable-line
     switch (prefix) {
       case 'int': case 'uint':
         if (coder) { throw new Error(invalidTypeErrorMessage); }
-        var size = parseInt(part[3] || 256);
-        if (size === 0 || size > 256 || (size % 8) !== 0) {
-            throw new Error(`[ethjs-abi] while getting param coder for type ${type}, invalid ${prefix}<N> width: ${type}`);
+        var intSize = parseInt(part[3] || 256); // eslint-disable-line
+        if (intSize === 0 || intSize > 256 || (intSize % 8) !== 0) {
+          throw new Error(`[ethjs-abi] while getting param coder for type ${type}, invalid ${prefix}<N> width: ${type}`);
         }
 
-        coder = coderNumber(size / 8, (prefix === 'int'));
+        coder = coderNumber(intSize / 8, (prefix === 'int'));
         break;
 
       case 'bool':
-        if (coder) { throw new Error(invalidTypeError); }
+        if (coder) { throw new Error(invalidTypeErrorMessage); }
         coder = coderBoolean;
         break;
 
@@ -385,9 +378,9 @@ function getParamCoder(type) {
       case 'bytes':
         if (coder) { throw new Error(invalidTypeErrorMessage); }
         if (part[3]) {
-          var size = parseInt(part[3]);
+          var size = parseInt(part[3]); // eslint-disable-line
           if (size === 0 || size > 32) {
-              throw new Error(`[ethjs-abi] while getting param coder for prefix bytes, invalid type ${type}, size ${size} should be 0 or greater than 32`);
+            throw new Error(`[ethjs-abi] while getting param coder for prefix bytes, invalid type ${type}, size ${size} should be 0 or greater than 32`);
           }
           coder = coderFixedBytes(size);
         } else {
@@ -408,8 +401,8 @@ function getParamCoder(type) {
       // "[0-9+]"
       default:
         if (!coder || coder.dynamic) { throw new Error(invalidTypeErrorMessage); }
-        var size = parseInt(part[6]);
-        coder = coderArray(coder, size);
+        var defaultSize = parseInt(part[6]); // eslint-disable-line
+        coder = coderArray(coder, defaultSize);
     }
   }
 
@@ -427,10 +420,10 @@ module.exports = {
   hexlify,
   stripZeros,
 
-  sha3: sha3,
+  sha3,
 
   getKeys,
-  numberOrBN,
+  numberToBN,
   coderNumber,
   uint256Coder,
   coderBoolean,
@@ -441,4 +434,4 @@ module.exports = {
   coderArray,
   paramTypePart,
   getParamCoder,
-}
+};

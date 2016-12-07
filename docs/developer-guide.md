@@ -90,6 +90,26 @@ After build staging it is the `lib` folder which actually gets published to NPM.
 
 This is a requirement to run, test, lint and build this module.
 
+## Latest Webpack Figures
+
+Hash: 4fa0358f53cd22b7449f                                                           
+Version: webpack 2.1.0-beta.15
+Time: 1047ms
+           Asset    Size  Chunks             Chunk Names
+    ethjs-abi.js  263 kB       0  [emitted]  main
+ethjs-abi.js.map  322 kB       0  [emitted]  main
+    + 13 hidden modules
+
+> ethjs-abi@0.1.2 build:umd:min /home/nick/github/ethjs-abi
+> cross-env BABEL_ENV=commonjs NODE_ENV=production webpack --config ./internals/webpack/webpack.config.js ./lib/index.js --progress
+
+Hash: d64adbab3f85ed9aab80                                                           
+Version: webpack 2.1.0-beta.15
+Time: 4184ms
+           Asset    Size  Chunks             Chunk Names
+ethjs-abi.min.js  118 kB       0  [emitted]  main
+    + 13 hidden modules
+
 ## Changelog
 
 All relevant changes are notated in the `CHANGELOG.md` file, moniter this file for changes to this repository.

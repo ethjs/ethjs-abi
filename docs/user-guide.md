@@ -31,7 +31,7 @@ const getInputBytecode = abi.encodeMethod(SimpleStoreABI[1], []);
 
 const getMethodOutputBytecode = abi.decodeMethod(SimpleStoreABI[1], "0x000000000000000000000000000000000000000000000000000000000000b26e");
 
-// returns Result { '0': <BigNumber: b26e>, storeValue: <BigNumber: b26e> }
+// returns Result { '0': <BN: b26e>, storeValue: <BN: b26e> }
 
 
 
@@ -42,16 +42,16 @@ const SetCompleteInputBytecode = abi.encodeEvent(SimpleStoreABI[2], [24000, "0xc
 const SetCompleteOutputBytecode = abi.decodeEvent(SimpleStoreABI[2], "0x0000000000000000000000000000000000000000000000000000000000000d7d000000000000000000000000ca35b7d915458ef540ade6068dfe2f44e8fa733c");
 
 /* returns   Result {
-  '0': <BigNumber: d7d>,
+  '0': <BN: d7d>,
   '1': '0xca35b7d915458ef540ade6068dfe2f44e8fa733c',
-  _newValue: <BigNumber: d7d>,
+  _newValue: <BN: d7d>,
   _sender: '0xca35b7d915458ef540ade6068dfe2f44e8fa733c' }
 */
 ```
 
-## BigNumber
+## BN
 
-This module returns `BigNumber`s for all quantity values. However, the module supports both BN.js and BigNumber.js modules for encoding, but will only return `BigNumber` instances while decoding.
+This module returns `BN`s for all quantity values. However, the module supports both BN.js and BigNumber.js modules for encoding, but will only return `BN` instances while decoding.
 
 ## Safe Object Returns (decoding)
 
@@ -61,11 +61,21 @@ For example:
 
 ```js
 {
-  '0': <BigNumber: d7d>,
+  '0': <BN: d7d>,
   '1': '0xca35b7d915458ef540ade6068dfe2f44e8fa733c',
-  _newValue: <BigNumber: d7d>,
+  _newValue: <BN: d7d>,
   _sender: '0xca35b7d915458ef540ade6068dfe2f44e8fa733c' }
 ```
+
+## Why BN.js?
+
+`ethjs` has made a policy of using `BN.js` across all of its repositories. Here are some of the reasons why:
+
+  1. lighter than alternatives (BigNumber.js)
+  2. faster than most alternatives, see [benchmarks](https://github.com/indutny/bn.js/issues/89)
+  3. used by the Ethereum foundation across all [`ethereumjs`](https://github.com/ethereumjs) repositories
+  4. is already used by a critical JS dependency of many ethereum packages, see package [`elliptic`](https://github.com/indutny/elliptic)
+  5. purposefully **does not support decimals or floats numbers** (for greater precision), remember, the Ethereum blockchain cannot and will not support float values or decimal numbers.
 
 ## Browser Builds
 
@@ -82,6 +92,26 @@ Note, even though `ethjs` should have transformed and polyfilled most of the req
 
 Use a polyfill service such as `Polyfill.io` to ensure complete cross-browser support:
 https://polyfill.io/
+
+## Latest Webpack Figures
+
+Hash: 4fa0358f53cd22b7449f                                                           
+Version: webpack 2.1.0-beta.15
+Time: 1047ms
+           Asset    Size  Chunks             Chunk Names
+    ethjs-abi.js  263 kB       0  [emitted]  main
+ethjs-abi.js.map  322 kB       0  [emitted]  main
+    + 13 hidden modules
+
+> ethjs-abi@0.1.2 build:umd:min /home/nick/github/ethjs-abi
+> cross-env BABEL_ENV=commonjs NODE_ENV=production webpack --config ./internals/webpack/webpack.config.js ./lib/index.js --progress
+
+Hash: d64adbab3f85ed9aab80                                                           
+Version: webpack 2.1.0-beta.15
+Time: 4184ms
+           Asset    Size  Chunks             Chunk Names
+ethjs-abi.min.js  118 kB       0  [emitted]  main
+    + 13 hidden modules
 
 ## Other Awesome Modules, Tools and Frameworks
 

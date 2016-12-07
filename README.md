@@ -64,7 +64,7 @@ const getInputBytecode = abi.encodeMethod(SimpleStoreABI[1], []);
 
 const getMethodOutputBytecode = abi.decodeMethod(SimpleStoreABI[1], "0x000000000000000000000000000000000000000000000000000000000000b26e");
 
-// returns Result { '0': <BigNumber: b26e>, storeValue: <BigNumber: b26e> }
+// returns Result { '0': <BN: b26e>, storeValue: <BN: b26e> }
 
 
 
@@ -75,9 +75,9 @@ const SetCompleteInputBytecode = abi.encodeEvent(SimpleStoreABI[2], [24000, "0xc
 const SetCompleteOutputBytecode = abi.decodeEvent(SimpleStoreABI[2], "0x0000000000000000000000000000000000000000000000000000000000000d7d000000000000000000000000ca35b7d915458ef540ade6068dfe2f44e8fa733c");
 
 /* returns   Result {
-  '0': <BigNumber: d7d>,
+  '0': <BN: d7d>,
   '1': '0xca35b7d915458ef540ade6068dfe2f44e8fa733c',
-  _newValue: <BigNumber: d7d>,
+  _newValue: <BN: d7d>,
   _sender: '0xca35b7d915458ef540ade6068dfe2f44e8fa733c' }
 */
 ```
