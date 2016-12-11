@@ -1,9 +1,8 @@
 {
   "name": "ethjs-abi",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Just the Ethereum encoding and decoding methods from the ethers-io-wallet.",
   "main": "lib/index.js",
-  "browser": "dist/ethjs-abi.js",
   "files": [
     "dist",
     "internals",
@@ -129,6 +128,13 @@
     "decoding"
   ],
   "author": "Nick Dodson <thenickdodson@gmail.com>",
+  "contributors": [
+    {
+      "name": "Richard Moore",
+      "email": "me@ricmoo.com",
+      "url": "https://ethers.io"
+    }
+  ],
   "repository": {
     "type": "git",
     "url": "git://github.com/ethjs/ethers-abi"

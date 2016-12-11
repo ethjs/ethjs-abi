@@ -1,68 +1,6 @@
 const BN = require('bn.js');
-const sha3 = require('ethjs-sha3');
 const numberToBN = require('number-to-bn');
-
-function getChecksumAddress(addressInput) {
-  var address = addressInput; // eslint-disable-line
-
-  if (typeof(address) !== 'string' || !address.match(/^0x[0-9A-Fa-f]{40}$/)) {
-    throw new Error(`[ethjs-abi] invalid address value ${JSON.stringify(address)} not a valid hex string`);
-  }
-
-  address = address.substring(2).toLowerCase();
-  const hashed = sha3(address, true);
-
-  address = address.split('');
-  for (var i = 0; i < 40; i += 2) { // eslint-disable-line
-    if ((hashed[i >> 1] >> 4) >= 8) {
-      address[i] = address[i].toUpperCase();
-    }
-    if ((hashed[i >> 1] & 0x0f) >= 8) {
-      address[i + 1] = address[i + 1].toUpperCase();
-    }
-  }
-
-  return `0x${address.join('')}`;
-}
-
-function getAddress(addressInput) {
-  var address = addressInput; // eslint-disable-line
-  var result = null; // eslint-disable-line
-
-  if (typeof(address) !== 'string') { throw new Error(`[ethjs-abi] invalid address value ${JSON.stringify(address)} not a valid hex string`); }
-
-  // Missing the 0x prefix
-  if (address.substring(0, 2) !== '0x' &&
-      address.substring(0, 2) !== 'XE') { address = `0x${address}`; }
-
-  if (address.match(/^(0x)?[0-9a-fA-F]{40}$/)) {
-    result = getChecksumAddress(address);
-
-    // It is a checksummed address with a bad checksum
-    if (address.match(/([A-F].*[a-f])|([a-f].*[A-F])/) && result !== address) {
-      throw new Error('invalid address checksum');
-    }
-
-  // Maybe ICAP? (we only support direct mode)
-  } else if (address.match(/^XE[0-9]{2}[0-9A-Za-z]{30,31}$/)) {
-    throw new Error('[ethjs-abi] ICAP and IBAN addresses, not supported yet..');
-
-    /*
-    // It is an ICAP address with a bad checksum
-    if (address.substring(2, 4) !== ibanChecksum(address)) {
-      throw new Error('invalid address icap checksum');
-    }
-
-    result = (new BN(address.substring(4), 36)).toString(16);
-    while (result.length < 40) { result = '0' + result; }
-    result = getChecksumAddress('0x' + result);
-    */
-  } else {
-    throw new Error(`[ethjs-abi] invalid address value ${JSON.stringify(address)} not a valid hex string`);
-  }
-
-  return result;
-}
+const sha3 = require('ethjs-sha3');
 
 // from ethereumjs-util
 function stripZeros(aInput) {
@@ -412,8 +350,6 @@ function getParamCoder(typeInput) {
 
 module.exports = {
   BN,
-  getAddress,
-  getChecksumAddress,
   bnToBuffer,
   isHexString,
   hexOrBuffer,

@@ -1,3 +1,8 @@
+# 0.1.3 -- config fixes
+
+1. webpack config updates
+2. build config updates
+
 # 0.1.2 -- removal of BigNumber for BN
 
 1. Removal of BigNumber for BN (see `user-guide` for more)
