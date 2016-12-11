@@ -1,7 +1,9 @@
-# 0.1.3 -- config fixes
+# 0.1.4 -- config fixes
 
-1. webpack config updates
-2. build config updates
+1. Webpack config updates
+2. Build config updates
+3. Less deps
+4. Better number handling
 
 # 0.1.2 -- removal of BigNumber for BN
 
@@ -20,10 +22,10 @@
 
 # 0.0.4 -- more adjustments, stronger typing
 
-1. more adjustments
-2. stronger typing
-3. more accepting convertions
-4. more coverage
+1. More adjustments
+2. Stronger typing
+3. More accepting convertions
+4. More coverage
 
 # 0.0.3 -- travis fix, better testing
 
