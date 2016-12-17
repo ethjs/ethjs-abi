@@ -1,6 +1,6 @@
 const BN = require('bn.js');
 const numberToBN = require('number-to-bn');
-const sha3 = require('ethjs-sha3');
+const keccak256 = require('js-sha3').keccak_256;
 
 // from ethereumjs-util
 function stripZeros(aInput) {
@@ -356,7 +356,7 @@ module.exports = {
   hexlify,
   stripZeros,
 
-  sha3,
+  keccak256,
 
   getKeys,
   numberToBN,

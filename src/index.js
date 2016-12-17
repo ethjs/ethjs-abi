@@ -90,7 +90,7 @@ function decodeParams(names, types, data) {
 // encode method ABI object with values in an array, output bytecode
 function encodeMethod(method, values) {
   const signature = `${method.name}(${utils.getKeys(method.inputs, 'type').join(',')})`;
-  const signatureEncoded = `0x${utils.sha3(signature, true).slice(0, 4).toString('hex')}`;
+  const signatureEncoded = `0x${(new Buffer(utils.keccak256(signature), 'hex')).slice(0, 4).toString('hex')}`;
   const paramsEncoded = encodeParams(utils.getKeys(method.inputs, 'type'), values).substring(2);
 
   return `${signatureEncoded}${paramsEncoded}`;

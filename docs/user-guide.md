@@ -96,20 +96,20 @@ https://polyfill.io/
 ## Latest Webpack Figures
 
 ```
-Hash: 5fc1c2dac83fee9ab0e2                                                           
+Hash: 492bde711463f9215365                                                           
 Version: webpack 2.1.0-beta.15
-Time: 1021ms
+Time: 1066ms
            Asset    Size  Chunks             Chunk Names
-    ethjs-abi.js  203 kB       0  [emitted]  main
-ethjs-abi.js.map  249 kB       0  [emitted]  main
-    + 20 hidden modules
+    ethjs-abi.js  186 kB       0  [emitted]  main
+ethjs-abi.js.map  228 kB       0  [emitted]  main
+    + 14 hidden modules
 
-Hash: 0432b244266e1efebdd5                                                           
+Hash: a5dc8d1c909ad22a89ba                                                           
 Version: webpack 2.1.0-beta.15
-Time: 3522ms
-           Asset   Size  Chunks             Chunk Names
-ethjs-abi.min.js  94 kB       0  [emitted]  main
-    + 20 hidden modules
+Time: 4291ms
+           Asset     Size  Chunks             Chunk Names
+ethjs-abi.min.js  83.1 kB       0  [emitted]  main
+    + 14 hidden modules
 ```
 
 ## Other Awesome Modules, Tools and Frameworks

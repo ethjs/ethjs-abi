@@ -1,3 +1,7 @@
+# 0.1.5 -- replace out sha3
+
+1. Getting rid of `ethjs-sha3` for `js-sha3`
+
 # 0.1.4 -- config fixes
 
 1. Webpack config updates
