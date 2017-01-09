@@ -15,7 +15,7 @@ function Result() {}
 
 function encodeParams(types, values) {
   if (types.length !== values.length) {
-    throw new Error('types/values mismatch');
+    throw new Error(`Your contract requires ${types.length} types, and you passed in ${values.length}`);
   }
 
   var parts = [];
