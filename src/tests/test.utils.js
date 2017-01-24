@@ -93,6 +93,13 @@ describe('test utilty methods', () => {
     it('not valid coder address', () => {
       assert.throws(() => utils.coderAddress.decode('sfdsfd', 40), Error);
     });
+
+    it('should decode nicely', () => {
+      assert.deepEqual(utils.coderAddress.decode([], 40), {
+        consumed: 32,
+        value: '0x',
+      });
+    });
   });
 
   describe('coderFixedBytes', () => {

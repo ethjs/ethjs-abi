@@ -162,6 +162,12 @@ const coderAddress = {
     return result;
   },
   decode: function decodeAddress(data, offset) {
+    if (data.length === 0) {
+      return {
+        consumed: 32,
+        value: '0x',
+      };
+    }
     if (data.length < offset + 32) { throw new Error(`[ethjs-abi] while decoding address data, invalid address data, invalid byte length ${data.length}`); }
     return {
       consumed: 32,

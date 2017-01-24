@@ -1,3 +1,7 @@
+# 0.1.7 -- handles empty address decode nicely
+
+1. Handles decode of value [] -- '0x' nicely..
+
 # 0.1.6 -- BN formatting update
 
 1. BN formatting update
