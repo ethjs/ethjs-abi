@@ -20,6 +20,7 @@ describe('test basic encoding and decoding functionality', () => {
     abi.encodeEvent(interfaceABI[2], [24000, '0xca35b7d915458ef540ade6068dfe2f44e8fa733c']);
     const event = abi.decodeEvent(interfaceABI[2], '0x0000000000000000000000000000000000000000000000000000000000000d7d000000000000000000000000ca35b7d915458ef540ade6068dfe2f44e8fa733c');
     assert.deepEqual(event, {
+      _eventName: 'SetComplete',
       _newValue: new BN(3453),
       _sender: '0xca35b7d915458ef540ade6068dfe2f44e8fa733c',
     });
@@ -55,6 +56,7 @@ describe('test basic encoding and decoding functionality', () => {
 
     const decoded = abi.decodeEvent(eventAbi, logs[0].data, logs[0].topics);
     assert.deepEqual(decoded, {
+      _eventName: 'IdentityCreated',
       userKey: '0x50858f2c7873fac9398ed9c195d185089caa7967',
       proxy: '0x0aa622ec7d114c8a18730a9a6147ffbded11cefa',
       controller: '0xcec030978d9e5e8b4ad689b1f509f8e9617efbe3',
@@ -62,6 +64,7 @@ describe('test basic encoding and decoding functionality', () => {
     });
 
     assert.deepEqual(abi.decodeLogItem(eventAbi, logs[0]), {
+      _eventName: 'IdentityCreated',
       userKey: '0x50858f2c7873fac9398ed9c195d185089caa7967',
       proxy: '0x0aa622ec7d114c8a18730a9a6147ffbded11cefa',
       controller: '0xcec030978d9e5e8b4ad689b1f509f8e9617efbe3',
@@ -71,6 +74,7 @@ describe('test basic encoding and decoding functionality', () => {
     const decode = abi.logDecoder([eventAbi].concat(interfaceABI));
 
     assert.deepEqual(decode(logs), [{
+      _eventName: 'IdentityCreated',
       userKey: '0x50858f2c7873fac9398ed9c195d185089caa7967',
       proxy: '0x0aa622ec7d114c8a18730a9a6147ffbded11cefa',
       controller: '0xcec030978d9e5e8b4ad689b1f509f8e9617efbe3',

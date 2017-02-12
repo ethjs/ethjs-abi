@@ -1,5 +1,5 @@
 {
-  "name": "ethjs-abi",
+  "name": "ethjs-abi-pelle",
   "version": "0.1.8",
   "description": "Just the Ethereum encoding and decoding methods from the ethers-io-wallet.",
   "main": "lib/index.js",

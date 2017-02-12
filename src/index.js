@@ -126,6 +126,7 @@ function decodeEvent(eventObject, data, topics) {
     const coder = getParamCoder(input.type);
     event[input.name] = coder.decode(topic, 0).value;
   })
+  event._eventName = eventObject.name
   return event;
 }
 
