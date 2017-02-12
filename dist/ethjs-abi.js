@@ -6612,8 +6612,6 @@ module.exports = Array.isArray || function (arr) {
 var BN = __webpack_require__(1);
 var stripHexPrefix = __webpack_require__(12);
 
-console.log(new BN('87234987239872349872489724897248972348972389472498728723897234', 16).toString(10));
-
 /**
  * Returns a BN object, converts a number value to a BN
  * @param {String|Number|Object} `arg` input a string number, hex string number, number, BigNumber or BN object

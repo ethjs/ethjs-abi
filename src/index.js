@@ -59,7 +59,7 @@ function encodeParams(types, values) {
 }
 
 // decode bytecode data from output names and types
-function decodeParams(names, types, data) {
+function decodeParams(names, types, data, useNumberedParams = true) {
   // Names is optional, so shift over all the parameters if not provided
   if (arguments.length < 3) {
     data = types;
@@ -81,7 +81,7 @@ function decodeParams(names, types, data) {
       var result = coder.decode(data, offset);
       offset += result.consumed;
     }
-    values[index] = result.value;
+    if (useNumberedParams) values[index] = result.value;
     if (names[index]) { values[names[index]] = result.value; }
   });
   return values;
@@ -109,13 +109,42 @@ function encodeEvent(eventObject, values) {
   return encodeMethod(eventObject, values);
 }
 
-// decode method data bytecode, from method ABI object
-function decodeEvent(eventObject, data) {
-  const inputNames = utils.getKeys(eventObject.inputs, 'name', true);
-  const inputTypes = utils.getKeys(eventObject.inputs, 'type');
-
-  return decodeParams(inputNames, inputTypes, utils.hexOrBuffer(data));
+function eventSignature(eventObject) {
+  const signature = `${eventObject.name}(${utils.getKeys(eventObject.inputs, 'type').join(',')})`;
+  return `0x${utils.keccak256(signature)}`;
 }
+
+// decode method data bytecode, from method ABI object
+function decodeEvent(eventObject, data, topics) {
+  const nonIndexed = eventObject.inputs.filter((input) => !input.indexed)
+  const nonIndexedNames = utils.getKeys(nonIndexed, 'name', true);
+  const nonIndexedTypes = utils.getKeys(nonIndexed, 'type');
+  const event = decodeParams(nonIndexedNames, nonIndexedTypes, utils.hexOrBuffer(data), false);
+  const topicOffset = eventObject.anonymous ? 0 : 1;
+  eventObject.inputs.filter((input) => input.indexed).map((input, i) => {
+    const topic = new Buffer(topics[i + topicOffset].slice(2),'hex');
+    const coder = getParamCoder(input.type);
+    event[input.name] = coder.decode(topic, 0).value;
+  })
+  return event;
+}
+
+function decodeLogItem(eventObject, log) {
+  if (eventObject && log.topics[0] === eventSignature(eventObject)) {
+    return decodeEvent(eventObject, log.data, log.topics)
+  }
+}
+
+function logDecoder(abi) {
+  const eventMap = {}
+  abi.filter(item => item.type === 'event').map(item => {
+    eventMap[eventSignature(item)] = item
+  })
+  return function(logItems) {
+    return logItems.map(log => decodeLogItem(eventMap[log.topics[0]], log)).filter(i => i)
+  }
+}
+
 
 module.exports = {
   encodeParams,
@@ -124,4 +153,7 @@ module.exports = {
   decodeMethod,
   encodeEvent,
   decodeEvent,
+  decodeLogItem,
+  logDecoder,
+  eventSignature
 };
