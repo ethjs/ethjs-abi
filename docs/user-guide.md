@@ -33,20 +33,34 @@ const getMethodOutputBytecode = abi.decodeMethod(SimpleStoreABI[1], "0x000000000
 
 // returns Result { '0': <BN: b26e>, storeValue: <BN: b26e> }
 
-
-
 const SetCompleteInputBytecode = abi.encodeEvent(SimpleStoreABI[2], [24000, "0xca35b7d915458ef540ade6068dfe2f44e8fa733c"]);
 
 // returns 0x10e8e9bc0000000000000000000000000000000000000000000000000000000000005dc0000000000000000000000000ca35b7d915458ef540ade6068dfe2f44e8fa733c
 
-const SetCompleteOutputBytecode = abi.decodeEvent(SimpleStoreABI[2], "0x0000000000000000000000000000000000000000000000000000000000000d7d000000000000000000000000ca35b7d915458ef540ade6068dfe2f44e8fa733c");
+const event = abi.decodeEvent(SimpleStoreABI[2], "0x0000000000000000000000000000000000000000000000000000000000000d7d000000000000000000000000ca35b7d915458ef540ade6068dfe2f44e8fa733c");
 
 /* returns   Result {
-  '0': <BN: d7d>,
-  '1': '0xca35b7d915458ef540ade6068dfe2f44e8fa733c',
   _newValue: <BN: d7d>,
   _sender: '0xca35b7d915458ef540ade6068dfe2f44e8fa733c' }
 */
+
+const event = abi.decodeLogItem(SimpleStoreABI[2], receipt.log[0]);
+
+/* returns   Result {
+  _newValue: <BN: d7d>,
+  _sender: '0xca35b7d915458ef540ade6068dfe2f44e8fa733c' }
+*/
+
+const decoder = abi.logDecoder(SimpeStoreABI)
+
+const events = decoder(receipt.logs)
+/* returns   Result [{
+  _newValue: <BN: d7d>,
+  _sender: '0xca35b7d915458ef540ade6068dfe2f44e8fa733c' 
+}]
+*/
+
+
 ```
 
 ## BN

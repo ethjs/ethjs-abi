@@ -5894,12 +5894,16 @@ function decodeEvent(eventObject, data, topics) {
   return event;
 }
 
+// Decode a specific log item with a specific event abi
 function decodeLogItem(eventObject, log) {
   if (eventObject && log.topics[0] === eventSignature(eventObject)) {
     return decodeEvent(eventObject, log.data, log.topics);
   }
 }
 
+// Create a decoder for all events defined in an abi. It returns a function which is called
+// on an array of log entries such as received from getLogs or getTransactionReceipt and parses
+// any matching log entries
 function logDecoder(abi) {
   var eventMap = {};
   abi.filter(function (item) {
