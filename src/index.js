@@ -115,11 +115,11 @@ function eventSignature(eventObject) {
 }
 
 // decode method data bytecode, from method ABI object
-function decodeEvent(eventObject, data, topics) {
+function decodeEvent(eventObject, data, topics, useNumberedParams = true) {
   const nonIndexed = eventObject.inputs.filter((input) => !input.indexed)
   const nonIndexedNames = utils.getKeys(nonIndexed, 'name', true);
   const nonIndexedTypes = utils.getKeys(nonIndexed, 'type');
-  const event = decodeParams(nonIndexedNames, nonIndexedTypes, utils.hexOrBuffer(data), false);
+  const event = decodeParams(nonIndexedNames, nonIndexedTypes, utils.hexOrBuffer(data), useNumberedParams);
   const topicOffset = eventObject.anonymous ? 0 : 1;
   eventObject.inputs.filter((input) => input.indexed).map((input, i) => {
     const topic = new Buffer(topics[i + topicOffset].slice(2),'hex');
@@ -131,22 +131,22 @@ function decodeEvent(eventObject, data, topics) {
 }
 
 // Decode a specific log item with a specific event abi
-function decodeLogItem(eventObject, log) {
+function decodeLogItem(eventObject, log, useNumberedParams = true) {
   if (eventObject && log.topics[0] === eventSignature(eventObject)) {
-    return decodeEvent(eventObject, log.data, log.topics)
+    return decodeEvent(eventObject, log.data, log.topics, useNumberedParams)
   }
 }
 
 // Create a decoder for all events defined in an abi. It returns a function which is called
 // on an array of log entries such as received from getLogs or getTransactionReceipt and parses
 // any matching log entries
-function logDecoder(abi) {
+function logDecoder(abi, useNumberedParams = true) {
   const eventMap = {}
   abi.filter(item => item.type === 'event').map(item => {
     eventMap[eventSignature(item)] = item
   })
   return function(logItems) {
-    return logItems.map(log => decodeLogItem(eventMap[log.topics[0]], log)).filter(i => i)
+    return logItems.map(log => decodeLogItem(eventMap[log.topics[0]], log, useNumberedParams)).filter(i => i)
   }
 }
 

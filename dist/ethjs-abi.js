@@ -5877,12 +5877,14 @@ function eventSignature(eventObject) {
 
 // decode method data bytecode, from method ABI object
 function decodeEvent(eventObject, data, topics) {
+  var useNumberedParams = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+
   var nonIndexed = eventObject.inputs.filter(function (input) {
     return !input.indexed;
   });
   var nonIndexedNames = utils.getKeys(nonIndexed, 'name', true);
   var nonIndexedTypes = utils.getKeys(nonIndexed, 'type');
-  var event = decodeParams(nonIndexedNames, nonIndexedTypes, utils.hexOrBuffer(data), false);
+  var event = decodeParams(nonIndexedNames, nonIndexedTypes, utils.hexOrBuffer(data), useNumberedParams);
   var topicOffset = eventObject.anonymous ? 0 : 1;
   eventObject.inputs.filter(function (input) {
     return input.indexed;
@@ -5891,13 +5893,16 @@ function decodeEvent(eventObject, data, topics) {
     var coder = getParamCoder(input.type);
     event[input.name] = coder.decode(topic, 0).value;
   });
+  event._eventName = eventObject.name;
   return event;
 }
 
 // Decode a specific log item with a specific event abi
 function decodeLogItem(eventObject, log) {
+  var useNumberedParams = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
   if (eventObject && log.topics[0] === eventSignature(eventObject)) {
-    return decodeEvent(eventObject, log.data, log.topics);
+    return decodeEvent(eventObject, log.data, log.topics, useNumberedParams);
   }
 }
 
@@ -5905,6 +5910,8 @@ function decodeLogItem(eventObject, log) {
 // on an array of log entries such as received from getLogs or getTransactionReceipt and parses
 // any matching log entries
 function logDecoder(abi) {
+  var useNumberedParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
   var eventMap = {};
   abi.filter(function (item) {
     return item.type === 'event';
@@ -5913,7 +5920,7 @@ function logDecoder(abi) {
   });
   return function (logItems) {
     return logItems.map(function (log) {
-      return decodeLogItem(eventMap[log.topics[0]], log);
+      return decodeLogItem(eventMap[log.topics[0]], log, useNumberedParams);
     }).filter(function (i) {
       return i;
     });
