@@ -2,11 +2,48 @@
 
 Just method and event encoding and decoding from the [`ethers-wallet`](https://github.com/ethers-io/ethers-wallet).
 
-Note, this package is experimental, incomplete and is under construction.
+Note, this package is experimental, and is not ready for production use.
+
+<div>
+  <!-- Dependency Status -->
+  <a href="https://david-dm.org/ethjs/ethjs-abi">
+    <img src="https://david-dm.org/ethjs/ethjs-abi.svg"
+    alt="Dependency Status" />
+  </a>
+
+  <!-- devDependency Status -->
+  <a href="https://david-dm.org/ethjs/ethjs-abi#info=devDependencies">
+    <img src="https://david-dm.org/ethjs/ethjs-abi/dev-status.svg" alt="devDependency Status" />
+  </a>
+
+  <!-- Build Status -->
+  <a href="https://travis-ci.org/ethjs/ethjs-abi">
+    <img src="https://travis-ci.org/ethjs/ethjs-abi.svg"
+    alt="Build Status" />
+  </a>
+
+  <!-- NPM Version -->
+  <a href="https://www.npmjs.org/package/ethjs-abi">
+    <img src="http://img.shields.io/npm/v/ethjs-abi.svg"
+    alt="NPM version" />
+  </a>
+
+  <!-- Test Coverage -->
+  <a href="https://coveralls.io/r/ethjs/ethjs-abi">
+    <img src="https://coveralls.io/repos/github/ethjs/ethjs-abi/badge.svg" alt="Test Coverage" />
+  </a>
+
+  <!-- Javascript Style -->
+  <a href="http://airbnb.io/javascript/">
+    <img src="https://img.shields.io/badge/code%20style-airbnb-brightgreen.svg" alt="js-airbnb-style" />
+  </a>
+</div>
+
+<br />
 
 ## Usage
 
-```
+```js
 const abi = require('ethjs-abi');
 const SimpleStoreABI = [{"constant":false,"inputs":[{"name":"_value","type":"uint256"}],"name":"set","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"get","outputs":[{"name":"storeValue","type":"uint256"}],"payable":false,"type":"function"},{"anonymous":false,"inputs":[{"indexed":false,"name":"_newValue","type":"uint256"},{"indexed":false,"name":"_sender","type":"address"}],"name":"SetComplete","type":"event"}];
 
@@ -77,28 +114,24 @@ Just the encoding and decoding of contract data.
 
 Please help better the ecosystem by submitting issues and pull requests to default. We need all the help we can get to build the absolute best linting standards and utilities. We follow the AirBNB linting standard and the unix philosophy.
 
-<!--
 ## Guides
 
-You'll find more detailed information on using default and tailoring it to your needs in our guides:
+You'll find more detailed information on using `ethjs-abi` and tailoring it to your needs in our guides:
 
 - [User guide](docs/user-guide.md) - Usage, configuration, FAQ and complementary tools.
-- [Developer guide](docs/developer-guide.md) - Contributing to wafr and writing your own plugins & formatters.
--->
+- [Developer guide](docs/developer-guide.md) - Contributing to `ethjs-abi` and writing your own code and coverage.
 
 ## Help out
 
 There is always a lot of work to do, and will have many rules to maintain. So please help out in any way that you can:
 
-<!-- - Create, enhance, and debug rules (see our guide to ["Working on rules"](./github/CONTRIBUTING.md)). -->
+- Create, enhance, and debug ethjs rules (see our guide to ["Working on rules"](./github/CONTRIBUTING.md)).
 - Improve documentation.
 - Chime in on any open issue or pull request.
-- Open new issues about your ideas for making stylelint better, and pull requests to show us how your idea works.
+- Open new issues about your ideas for making `ethjs-abi` better, and pull requests to show us how your idea works.
 - Add new tests to *absolutely anything*.
-- Create or contribute to ecosystem tools, like the plugins for Atom and Sublime Text.
+- Create or contribute to ecosystem tools, like modules for encoding or contracts.
 - Spread the word.
-
-Please consult our [Code of Conduct](CODE_OF_CONDUCT.md) docs before helping out.
 
 We communicate via [issues](https://github.com/ethjs/ethjs-abi/issues) and [pull requests](https://github.com/ethjs/ethjs-abi/pulls).
 

@@ -15,7 +15,7 @@ function Result() {}
 
 function encodeParams(types, values) {
   if (types.length !== values.length) {
-    throw new Error(`Your contract requires ${types.length} types, and you passed in ${values.length}`);
+    throw new Error(`[ethjs-abi] while encoding params, types/values mismatch, Your contract requires ${types.length} types (arguments), and you passed in ${values.length}`);
   }
 
   var parts = [];
@@ -59,7 +59,7 @@ function encodeParams(types, values) {
 }
 
 // decode bytecode data from output names and types
-function decodeParams(names, types, data) {
+function decodeParams(names, types, data, useNumberedParams = true) {
   // Names is optional, so shift over all the parameters if not provided
   if (arguments.length < 3) {
     data = types;
@@ -81,7 +81,7 @@ function decodeParams(names, types, data) {
       var result = coder.decode(data, offset);
       offset += result.consumed;
     }
-    values[index] = result.value;
+    if (useNumberedParams) values[index] = result.value;
     if (names[index]) { values[names[index]] = result.value; }
   });
   return values;
@@ -90,7 +90,7 @@ function decodeParams(names, types, data) {
 // encode method ABI object with values in an array, output bytecode
 function encodeMethod(method, values) {
   const signature = `${method.name}(${utils.getKeys(method.inputs, 'type').join(',')})`;
-  const signatureEncoded = `0x${utils.sha3(signature, true).slice(0, 4).toString('hex')}`;
+  const signatureEncoded = `0x${(new Buffer(utils.keccak256(signature), 'hex')).slice(0, 4).toString('hex')}`;
   const paramsEncoded = encodeParams(utils.getKeys(method.inputs, 'type'), values).substring(2);
 
   return `${signatureEncoded}${paramsEncoded}`;
@@ -109,13 +109,47 @@ function encodeEvent(eventObject, values) {
   return encodeMethod(eventObject, values);
 }
 
-// decode method data bytecode, from method ABI object
-function decodeEvent(eventObject, data) {
-  const inputNames = utils.getKeys(eventObject.inputs, 'name', true);
-  const inputTypes = utils.getKeys(eventObject.inputs, 'type');
-
-  return decodeParams(inputNames, inputTypes, utils.hexOrBuffer(data));
+function eventSignature(eventObject) {
+  const signature = `${eventObject.name}(${utils.getKeys(eventObject.inputs, 'type').join(',')})`;
+  return `0x${utils.keccak256(signature)}`;
 }
+
+// decode method data bytecode, from method ABI object
+function decodeEvent(eventObject, data, topics, useNumberedParams = true) {
+  const nonIndexed = eventObject.inputs.filter((input) => !input.indexed)
+  const nonIndexedNames = utils.getKeys(nonIndexed, 'name', true);
+  const nonIndexedTypes = utils.getKeys(nonIndexed, 'type');
+  const event = decodeParams(nonIndexedNames, nonIndexedTypes, utils.hexOrBuffer(data), useNumberedParams);
+  const topicOffset = eventObject.anonymous ? 0 : 1;
+  eventObject.inputs.filter((input) => input.indexed).map((input, i) => {
+    const topic = new Buffer(topics[i + topicOffset].slice(2),'hex');
+    const coder = getParamCoder(input.type);
+    event[input.name] = coder.decode(topic, 0).value;
+  })
+  event._eventName = eventObject.name
+  return event;
+}
+
+// Decode a specific log item with a specific event abi
+function decodeLogItem(eventObject, log, useNumberedParams = true) {
+  if (eventObject && log.topics[0] === eventSignature(eventObject)) {
+    return decodeEvent(eventObject, log.data, log.topics, useNumberedParams)
+  }
+}
+
+// Create a decoder for all events defined in an abi. It returns a function which is called
+// on an array of log entries such as received from getLogs or getTransactionReceipt and parses
+// any matching log entries
+function logDecoder(abi, useNumberedParams = true) {
+  const eventMap = {}
+  abi.filter(item => item.type === 'event').map(item => {
+    eventMap[eventSignature(item)] = item
+  })
+  return function(logItems) {
+    return logItems.map(log => decodeLogItem(eventMap[log.topics[0]], log, useNumberedParams)).filter(i => i)
+  }
+}
+
 
 module.exports = {
   encodeParams,
@@ -124,4 +158,7 @@ module.exports = {
   decodeMethod,
   encodeEvent,
   decodeEvent,
+  decodeLogItem,
+  logDecoder,
+  eventSignature
 };
