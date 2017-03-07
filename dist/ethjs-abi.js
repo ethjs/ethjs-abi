@@ -5817,6 +5817,8 @@ function encodeParams(types, values) {
 
 // decode bytecode data from output names and types
 function decodeParams(names, types, data) {
+  var useNumberedParams = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+
   // Names is optional, so shift over all the parameters if not provided
   if (arguments.length < 3) {
     data = types;
@@ -5838,7 +5840,7 @@ function decodeParams(names, types, data) {
       var result = coder.decode(data, offset);
       offset += result.consumed;
     }
-    values[index] = result.value;
+    if (useNumberedParams) values[index] = result.value;
     if (names[index]) {
       values[names[index]] = result.value;
     }
@@ -5868,12 +5870,61 @@ function encodeEvent(eventObject, values) {
   return encodeMethod(eventObject, values);
 }
 
-// decode method data bytecode, from method ABI object
-function decodeEvent(eventObject, data) {
-  var inputNames = utils.getKeys(eventObject.inputs, 'name', true);
-  var inputTypes = utils.getKeys(eventObject.inputs, 'type');
+function eventSignature(eventObject) {
+  var signature = eventObject.name + '(' + utils.getKeys(eventObject.inputs, 'type').join(',') + ')';
+  return '0x' + utils.keccak256(signature);
+}
 
-  return decodeParams(inputNames, inputTypes, utils.hexOrBuffer(data));
+// decode method data bytecode, from method ABI object
+function decodeEvent(eventObject, data, topics) {
+  var useNumberedParams = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : true;
+
+  var nonIndexed = eventObject.inputs.filter(function (input) {
+    return !input.indexed;
+  });
+  var nonIndexedNames = utils.getKeys(nonIndexed, 'name', true);
+  var nonIndexedTypes = utils.getKeys(nonIndexed, 'type');
+  var event = decodeParams(nonIndexedNames, nonIndexedTypes, utils.hexOrBuffer(data), useNumberedParams);
+  var topicOffset = eventObject.anonymous ? 0 : 1;
+  eventObject.inputs.filter(function (input) {
+    return input.indexed;
+  }).map(function (input, i) {
+    var topic = new Buffer(topics[i + topicOffset].slice(2), 'hex');
+    var coder = getParamCoder(input.type);
+    event[input.name] = coder.decode(topic, 0).value;
+  });
+  event._eventName = eventObject.name;
+  return event;
+}
+
+// Decode a specific log item with a specific event abi
+function decodeLogItem(eventObject, log) {
+  var useNumberedParams = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+
+  if (eventObject && log.topics[0] === eventSignature(eventObject)) {
+    return decodeEvent(eventObject, log.data, log.topics, useNumberedParams);
+  }
+}
+
+// Create a decoder for all events defined in an abi. It returns a function which is called
+// on an array of log entries such as received from getLogs or getTransactionReceipt and parses
+// any matching log entries
+function logDecoder(abi) {
+  var useNumberedParams = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : true;
+
+  var eventMap = {};
+  abi.filter(function (item) {
+    return item.type === 'event';
+  }).map(function (item) {
+    eventMap[eventSignature(item)] = item;
+  });
+  return function (logItems) {
+    return logItems.map(function (log) {
+      return decodeLogItem(eventMap[log.topics[0]], log, useNumberedParams);
+    }).filter(function (i) {
+      return i;
+    });
+  };
 }
 
 module.exports = {
@@ -5882,7 +5933,10 @@ module.exports = {
   encodeMethod: encodeMethod,
   decodeMethod: decodeMethod,
   encodeEvent: encodeEvent,
-  decodeEvent: decodeEvent
+  decodeEvent: decodeEvent,
+  decodeLogItem: decodeLogItem,
+  logDecoder: logDecoder,
+  eventSignature: eventSignature
 };
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
@@ -6611,8 +6665,6 @@ module.exports = Array.isArray || function (arr) {
 
 var BN = __webpack_require__(1);
 var stripHexPrefix = __webpack_require__(12);
-
-console.log(new BN('87234987239872349872489724897248972348972389472498728723897234', 16).toString(10));
 
 /**
  * Returns a BN object, converts a number value to a BN
