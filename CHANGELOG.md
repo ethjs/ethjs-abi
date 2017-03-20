@@ -1,3 +1,7 @@
+# 0.1.9 -- event and log decoding
+
+1. Event and log decoding methods
+
 # 0.1.7 -- handles empty address decode nicely
 
 1. Handles decode of value [] -- '0x' nicely..
