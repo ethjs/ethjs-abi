@@ -94,13 +94,19 @@ function decodeParams(names, types, data, useNumberedParams = true) {
   return values;
 }
 
-// encode method ABI object with values in an array, output bytecode
-function encodeMethod(method, values) {
+// create an encoded method signature from an ABI object
+function encodeSignature(method) {
   const signature = `${method.name}(${utils.getKeys(method.inputs, 'type').join(',')})`;
   const signatureEncoded = `0x${(new Buffer(utils.keccak256(signature), 'hex')).slice(0, 4).toString('hex')}`;
+
+  return signatureEncoded;
+}
+
+// encode method ABI object with values in an array, output bytecode
+function encodeMethod(method, values) {
   const paramsEncoded = encodeParams(utils.getKeys(method.inputs, 'type'), values).substring(2);
 
-  return `${signatureEncoded}${paramsEncoded}`;
+  return `${encodeSignature(method)}${paramsEncoded}`;
 }
 
 // decode method data bytecode, from method ABI object
@@ -171,5 +177,6 @@ module.exports = {
   decodeEvent,
   decodeLogItem,
   logDecoder,
-  eventSignature
+  eventSignature,
+  encodeSignature
 };

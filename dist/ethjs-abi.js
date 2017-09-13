@@ -5853,13 +5853,19 @@ function decodeParams(names, types, data) {
   return values;
 }
 
-// encode method ABI object with values in an array, output bytecode
-function encodeMethod(method, values) {
+// create an encoded method signature from an ABI object
+function encodeSignature(method) {
   var signature = method.name + '(' + utils.getKeys(method.inputs, 'type').join(',') + ')';
   var signatureEncoded = '0x' + new Buffer(utils.keccak256(signature), 'hex').slice(0, 4).toString('hex');
+
+  return signatureEncoded;
+}
+
+// encode method ABI object with values in an array, output bytecode
+function encodeMethod(method, values) {
   var paramsEncoded = encodeParams(utils.getKeys(method.inputs, 'type'), values).substring(2);
 
-  return '' + signatureEncoded + paramsEncoded;
+  return '' + encodeSignature(method) + paramsEncoded;
 }
 
 // decode method data bytecode, from method ABI object
@@ -5945,7 +5951,8 @@ module.exports = {
   decodeEvent: decodeEvent,
   decodeLogItem: decodeLogItem,
   logDecoder: logDecoder,
-  eventSignature: eventSignature
+  eventSignature: eventSignature,
+  encodeSignature: encodeSignature
 };
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0).Buffer))
 
