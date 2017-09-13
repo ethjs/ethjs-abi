@@ -1,3 +1,7 @@
+# 0.2.0 -- accept length zero
+
+1. accept length zero, '0x' for address/fixed and dymaic bytes
+
 # 0.1.9 -- event and log decoding
 
 1. Event and log decoding methods

@@ -141,7 +141,7 @@ function coderFixedBytes(length) {
       return result;
     },
     decode: function decodeFixedBytes(data, offset) {
-      if (data.length < offset + 32) { throw new Error(`[ethjs-abi] while decoding fixed bytes, invalid bytes data length: ${length}`); }
+      if (data.length !== 0 && data.length < offset + 32) { throw new Error(`[ethjs-abi] while decoding fixed bytes, invalid bytes data length: ${length}`); }
 
       return {
         consumed: 32,
@@ -168,7 +168,7 @@ const coderAddress = {
         value: '0x',
       };
     }
-    if (data.length < offset + 32) { throw new Error(`[ethjs-abi] while decoding address data, invalid address data, invalid byte length ${data.length}`); }
+    if (data.length !== 0 && data.length < offset + 32) { throw new Error(`[ethjs-abi] while decoding address data, invalid address data, invalid byte length ${data.length}`); }
     return {
       consumed: 32,
       value: `0x${data.slice(offset + 12, offset + 32).toString('hex')}`,
@@ -189,11 +189,11 @@ function encodeDynamicBytesHelper(value) {
 }
 
 function decodeDynamicBytesHelper(data, offset) {
-  if (data.length < offset + 32) { throw new Error(`[ethjs-abi] while decoding dynamic bytes data, invalid bytes length: ${data.length} should be less than ${offset + 32}`); }
+  if (data.length !== 0 && data.length < offset + 32) { throw new Error(`[ethjs-abi] while decoding dynamic bytes data, invalid bytes length: ${data.length} should be less than ${offset + 32}`); }
 
   var length = uint256Coder.decode(data, offset).value; // eslint-disable-line
   length = length.toNumber();
-  if (data.length < offset + 32 + length) { throw new Error(`[ethjs-abi] while decoding dynamic bytes data, invalid bytes length: ${data.length} should be less than ${offset + 32 + length}`); }
+  if (data.length !== 0 && data.length < offset + 32 + length) { throw new Error(`[ethjs-abi] while decoding dynamic bytes data, invalid bytes length: ${data.length} should be less than ${offset + 32 + length}`); }
 
   return {
     consumed: parseInt(32 + 32 * Math.ceil(length / 32), 10),
