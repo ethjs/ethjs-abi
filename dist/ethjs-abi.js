@@ -5482,7 +5482,7 @@ function coderFixedBytes(length) {
       return result;
     },
     decode: function decodeFixedBytes(data, offset) {
-      if (data.length < offset + 32) {
+      if (data.length !== 0 && data.length < offset + 32) {
         throw new Error('[ethjs-abi] while decoding fixed bytes, invalid bytes data length: ' + length);
       }
 
@@ -5513,7 +5513,7 @@ var coderAddress = {
         value: '0x'
       };
     }
-    if (data.length < offset + 32) {
+    if (data.length !== 0 && data.length < offset + 32) {
       throw new Error('[ethjs-abi] while decoding address data, invalid address data, invalid byte length ' + data.length);
     }
     return {
@@ -5532,13 +5532,13 @@ function encodeDynamicBytesHelper(value) {
 }
 
 function decodeDynamicBytesHelper(data, offset) {
-  if (data.length < offset + 32) {
+  if (data.length !== 0 && data.length < offset + 32) {
     throw new Error('[ethjs-abi] while decoding dynamic bytes data, invalid bytes length: ' + data.length + ' should be less than ' + (offset + 32));
   }
 
   var length = uint256Coder.decode(data, offset).value; // eslint-disable-line
   length = length.toNumber();
-  if (data.length < offset + 32 + length) {
+  if (data.length !== 0 && data.length < offset + 32 + length) {
     throw new Error('[ethjs-abi] while decoding dynamic bytes data, invalid bytes length: ' + data.length + ' should be less than ' + (offset + 32 + length));
   }
 
@@ -5832,6 +5832,7 @@ function decodeParams(names, types, data) {
   var offset = 0;
   types.forEach(function (type, index) {
     var coder = getParamCoder(type);
+
     if (coder.dynamic) {
       var dynamicOffset = uint256Coder.decode(data, offset);
       var result = coder.decode(data, dynamicOffset.value.toNumber());
@@ -5840,7 +5841,11 @@ function decodeParams(names, types, data) {
       var result = coder.decode(data, offset);
       offset += result.consumed;
     }
-    if (useNumberedParams) values[index] = result.value;
+
+    if (useNumberedParams) {
+      values[index] = result.value;
+    }
+
     if (names[index]) {
       values[names[index]] = result.value;
     }
@@ -5872,6 +5877,7 @@ function encodeEvent(eventObject, values) {
 
 function eventSignature(eventObject) {
   var signature = eventObject.name + '(' + utils.getKeys(eventObject.inputs, 'type').join(',') + ')';
+
   return '0x' + utils.keccak256(signature);
 }
 
@@ -5886,6 +5892,7 @@ function decodeEvent(eventObject, data, topics) {
   var nonIndexedTypes = utils.getKeys(nonIndexed, 'type');
   var event = decodeParams(nonIndexedNames, nonIndexedTypes, utils.hexOrBuffer(data), useNumberedParams);
   var topicOffset = eventObject.anonymous ? 0 : 1;
+
   eventObject.inputs.filter(function (input) {
     return input.indexed;
   }).map(function (input, i) {
@@ -5893,7 +5900,9 @@ function decodeEvent(eventObject, data, topics) {
     var coder = getParamCoder(input.type);
     event[input.name] = coder.decode(topic, 0).value;
   });
+
   event._eventName = eventObject.name;
+
   return event;
 }
 

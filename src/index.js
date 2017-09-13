@@ -73,6 +73,7 @@ function decodeParams(names, types, data, useNumberedParams = true) {
   var offset = 0;
   types.forEach(function(type, index) {
     var coder = getParamCoder(type);
+
     if (coder.dynamic) {
       var dynamicOffset = uint256Coder.decode(data, offset);
       var result = coder.decode(data, dynamicOffset.value.toNumber());
@@ -81,8 +82,14 @@ function decodeParams(names, types, data, useNumberedParams = true) {
       var result = coder.decode(data, offset);
       offset += result.consumed;
     }
-    if (useNumberedParams) values[index] = result.value;
-    if (names[index]) { values[names[index]] = result.value; }
+
+    if (useNumberedParams) {
+      values[index] = result.value;
+    }
+
+    if (names[index]) {
+      values[names[index]] = result.value;
+    }
   });
   return values;
 }
@@ -111,6 +118,7 @@ function encodeEvent(eventObject, values) {
 
 function eventSignature(eventObject) {
   const signature = `${eventObject.name}(${utils.getKeys(eventObject.inputs, 'type').join(',')})`;
+
   return `0x${utils.keccak256(signature)}`;
 }
 
@@ -121,12 +129,15 @@ function decodeEvent(eventObject, data, topics, useNumberedParams = true) {
   const nonIndexedTypes = utils.getKeys(nonIndexed, 'type');
   const event = decodeParams(nonIndexedNames, nonIndexedTypes, utils.hexOrBuffer(data), useNumberedParams);
   const topicOffset = eventObject.anonymous ? 0 : 1;
+
   eventObject.inputs.filter((input) => input.indexed).map((input, i) => {
-    const topic = new Buffer(topics[i + topicOffset].slice(2),'hex');
+    const topic = new Buffer(topics[i + topicOffset].slice(2), 'hex');
     const coder = getParamCoder(input.type);
     event[input.name] = coder.decode(topic, 0).value;
-  })
-  event._eventName = eventObject.name
+  });
+
+  event._eventName = eventObject.name;
+
   return event;
 }
 
