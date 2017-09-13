@@ -80,6 +80,10 @@ const SetCompleteOutputBytecode = abi.decodeEvent(SimpleStoreABI[2], "0x00000000
   _newValue: <BN: d7d>,
   _sender: '0xca35b7d915458ef540ade6068dfe2f44e8fa733c' }
 */
+
+const methodSig = abi.encodeSignature(SimpleStoreABI[2]);
+
+/* returns 0x10e8e9bc */
 ```
 
 for contract SimpleStore:
