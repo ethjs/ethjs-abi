@@ -18,7 +18,15 @@ const coderArray = utils.coderArray;
 const paramTypePart = utils.paramTypePart;
 const getParamCoder = utils.getParamCoder;
 
-function Result() {}
+function Result() {
+  this[Symbol.iterator] = function* () {
+    const keys = Object.keys(this);
+    for (key of keys) {
+      if (!this.hasOwnProperty(key) || !Number.isFinite(Number(key))) continue
+      yield this[key];
+    }
+  }
+}
 
 function encodeParams(types, values) {
   if (types.length !== values.length) {
