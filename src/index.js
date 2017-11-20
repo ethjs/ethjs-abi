@@ -19,11 +19,14 @@ const paramTypePart = utils.paramTypePart;
 const getParamCoder = utils.getParamCoder;
 
 function Result() {
-  this[Symbol.iterator] = function* () {
-    const keys = Object.keys(this);
-    for (key of keys) {
-      if (!this.hasOwnProperty(key) || !Number.isFinite(Number(key))) continue
-      yield this[key];
+  this[Symbol.iterator] = () => {
+    const keys = Object.keys(this)
+      .filter(key => Number.isFinite(Number(key)))
+    return {
+      next: () => {
+        if (!keys.length) return { value: undefined, done: true }
+        return { value: this[keys.shift()], done: false }
+      }
     }
   }
 }
