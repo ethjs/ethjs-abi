@@ -18,8 +18,6 @@ const coderArray = utils.coderArray;
 const paramTypePart = utils.paramTypePart;
 const getParamCoder = utils.getParamCoder;
 
-function Result() {}
-
 function encodeParams(types, values) {
   if (types.length !== values.length) {
     throw new Error(`[ethjs-abi] while encoding params, types/values mismatch, Your contract requires ${types.length} types (arguments), and you passed in ${values.length}`);
@@ -75,7 +73,7 @@ function decodeParams(names, types, data, useNumberedParams = true) {
   }
 
   data = utils.hexOrBuffer(data);
-  var values = new Result();
+  var values = [];
 
   var offset = 0;
   types.forEach(function(type, index) {
